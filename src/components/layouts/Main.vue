@@ -4,8 +4,12 @@ import { useRouter } from 'vue-router'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 import { faWatchmanMonitoring } from '@fortawesome/free-brands-svg-icons';
 import { faUserCircle } from '@fortawesome/free-regular-svg-icons';
+import { useAuthStore } from '@/stores/auth';
+import { faChevronDown } from '@fortawesome/free-solid-svg-icons';
 
 const router = useRouter()
+
+const { isLoggedIn } = useAuthStore()
 
 const matchesWithCurrentRoute = (routeName: string) => {
   return router.currentRoute.value.name === routeName;
@@ -27,10 +31,17 @@ const matchesWithCurrentRoute = (routeName: string) => {
       </div>
     </RouterLink>
     <div class="w-[600px] flex flex-row justify-end">
-      <RouterLink v-if="!matchesWithCurrentRoute('login')" to="/login" data-testid="login-button" class="p-2 rounded-xl bg-orange-200 flex items-center gap-2">
+      <RouterLink v-if="!isLoggedIn && !matchesWithCurrentRoute('login')" to="/login" data-testid="login-button" class="p-2 rounded-xl bg-orange-200 flex items-center gap-2">
         <FontAwesomeIcon :icon="faUserCircle" class="text-md" />
         <span class="text-md font-medium">Iniciar sesión</span>
       </RouterLink>
+      <div v-else-if="isLoggedIn" class="flex items-center gap-2">
+        <div class="p-2 rounded-xl bg-orange-200 flex items-center gap-2">
+          <FontAwesomeIcon :icon="faUserCircle" class="text-md" />
+          <span class="text-md font-medium">Bienvenido Pepe</span>
+          <FontAwesomeIcon :icon="faChevronDown" class="text-md" />
+        </div>
+      </div>
     </div>
   </header>
   <main class="flex flex-col items-center justify-center h-[calc(100vh-60px)]">
