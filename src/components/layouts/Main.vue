@@ -1,8 +1,15 @@
 <script setup lang="ts">
-import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
+import { useRouter } from 'vue-router'
 
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 import { faWatchmanMonitoring } from '@fortawesome/free-brands-svg-icons';
 import { faUserCircle } from '@fortawesome/free-regular-svg-icons';
+
+const router = useRouter()
+
+const matchesWithCurrentRoute = (routeName: string) => {
+  return router.currentRoute.value.name === routeName;
+}
 </script>
 
 <template>
@@ -20,7 +27,7 @@ import { faUserCircle } from '@fortawesome/free-regular-svg-icons';
       </div>
     </RouterLink>
     <div class="w-[600px] flex flex-row justify-end">
-      <RouterLink to="/login" data-testid="login-button" class="p-2 rounded-xl bg-orange-200 flex items-center gap-2">
+      <RouterLink v-if="!matchesWithCurrentRoute('login')" to="/login" data-testid="login-button" class="p-2 rounded-xl bg-orange-200 flex items-center gap-2">
         <FontAwesomeIcon :icon="faUserCircle" class="text-md" />
         <span class="text-md font-medium">Iniciar sesión</span>
       </RouterLink>

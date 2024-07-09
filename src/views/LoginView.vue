@@ -1,7 +1,12 @@
+<script setup lang="ts">
+import LoginForm from '@/components/LoginForm.vue'
+import MainLayout from '@/components/layouts/Main.vue'
+</script>
+
 <template>
-  <section>
-    <h1>Please login before accesing our monitoring service.</h1>
-  </section>
+  <MainLayout>
+    <LoginForm />
+  </MainLayout>
 </template>
 
 <style></style>
