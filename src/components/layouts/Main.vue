@@ -1,18 +1,18 @@
 <script setup lang="ts">
 import { useRouter } from 'vue-router'
+import { useAuthStore } from '@/stores/auth'
 
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
-import { faWatchmanMonitoring } from '@fortawesome/free-brands-svg-icons';
-import { faUserCircle } from '@fortawesome/free-regular-svg-icons';
-import { useAuthStore } from '@/stores/auth';
-import { faChevronDown } from '@fortawesome/free-solid-svg-icons';
+import { faWatchmanMonitoring } from '@fortawesome/free-brands-svg-icons'
+import { faUserCircle } from '@fortawesome/free-regular-svg-icons'
+import { faChevronDown } from '@fortawesome/free-solid-svg-icons'
 
 const router = useRouter()
 
-const { isLoggedIn } = useAuthStore()
+const authStore = useAuthStore()
 
 const matchesWithCurrentRoute = (routeName: string) => {
-  return router.currentRoute.value.name === routeName;
+  return router.currentRoute.value.name === routeName
 }
 </script>
 
@@ -20,8 +20,12 @@ const matchesWithCurrentRoute = (routeName: string) => {
   <header class="flex justify-between items-center py-4 px-8 bg-orange-100 h-[60px]">
     <div class="w-[600px] flex flex-row justify-start"></div>
     <RouterLink to="/">
-      <div class="flex items-center gap-4 bg-orange-200 h-[200px] w-[350px] translate-y-[-30px] rounded-full">
-        <div class="absolute bottom-0 top-[50%] left-0 right-0 flex items-center justify-center gap-4">
+      <div
+        class="flex items-center gap-4 bg-orange-200 h-[200px] w-[350px] translate-y-[-30px] rounded-full"
+      >
+        <div
+          class="absolute bottom-0 top-[50%] left-0 right-0 flex items-center justify-center gap-4"
+        >
           <FontAwesomeIcon :icon="faWatchmanMonitoring" class="text-orange-500 text-6xl" />
           <div class="flex flex-col w-[40%]">
             <h2 class="text-2xl font-bold">MaaS</h2>
@@ -31,16 +35,25 @@ const matchesWithCurrentRoute = (routeName: string) => {
       </div>
     </RouterLink>
     <div class="w-[600px] flex flex-row justify-end">
-      <RouterLink v-if="!isLoggedIn && !matchesWithCurrentRoute('login')" to="/login" data-testid="login-button" class="p-2 rounded-xl bg-orange-200 flex items-center gap-2">
-        <FontAwesomeIcon :icon="faUserCircle" class="text-md" />
-        <span class="text-md font-medium">Iniciar sesión</span>
-      </RouterLink>
-      <div v-else-if="isLoggedIn" class="flex items-center gap-2">
+      <div v-if="authStore.isLoggedIn" class="flex items-center gap-2">
         <div class="p-2 rounded-xl bg-orange-200 flex items-center gap-2">
           <FontAwesomeIcon :icon="faUserCircle" class="text-md" />
-          <span class="text-md font-medium">Bienvenido Pepe</span>
+          <span class="text-md font-medium" data-testid="welcome-message">{{
+            authStore.user.name
+          }}</span>
           <FontAwesomeIcon :icon="faChevronDown" class="text-md" />
         </div>
+      </div>
+      <div v-else class="flex items-center gap-2">
+        <RouterLink
+          v-if="!matchesWithCurrentRoute('login')"
+          to="/login"
+          data-testid="login-button"
+          class="p-2 rounded-xl bg-orange-200 flex items-center gap-2"
+        >
+          <FontAwesomeIcon :icon="faUserCircle" class="text-md" />
+          <span class="text-md font-medium">Iniciar sesión</span>
+        </RouterLink>
       </div>
     </div>
   </header>

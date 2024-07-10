@@ -50,7 +50,7 @@ const onSubmit = async () => {
         type="password" 
         placeholder="Contraseña" 
         autocomplete="current-password" />
-      <div v-if="isErrorVisible" class="flex flex-col gap-2 bg-red-300 p-4 rounded-lg shadow-md">
+      <div v-if="isErrorVisible" data-testid="error-message" class="flex flex-col gap-2 bg-red-300 p-4 rounded-lg shadow-md">
         <h4 class="text-md text-red-800">Ha ocurrido un error al iniciar sesión.</h4>
         <p class="text-sm text-red-800">Comprueba que las credenciales que ingresaste estén correctas.</p>
         <p>{{ errorMessage }}</p>
