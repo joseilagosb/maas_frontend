@@ -1,19 +1,32 @@
 <script setup lang="ts">
+import { ref, watchEffect } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 import { faWatchmanMonitoring } from '@fortawesome/free-brands-svg-icons'
-import { faUserCircle } from '@fortawesome/free-regular-svg-icons'
-import { faChevronDown } from '@fortawesome/free-solid-svg-icons'
+import { faEnvelope, faUserCircle } from '@fortawesome/free-regular-svg-icons'
+import { faChevronDown, faRightFromBracket } from '@fortawesome/free-solid-svg-icons'
+import { watch } from 'vue'
 
 const router = useRouter()
-
 const authStore = useAuthStore()
+
+const isUserMenuDropdownOpen = ref(false)
+
+const toggleUserMenuDropdown = () => {
+  isUserMenuDropdownOpen.value = !isUserMenuDropdownOpen.value
+}
 
 const matchesWithCurrentRoute = (routeName: string) => {
   return router.currentRoute.value.name === routeName
 }
+
+const onClickLogout = () => {
+  authStore.logout()
+  router.push('/login?redirected=loggedout')
+}
+
 </script>
 
 <template>
@@ -35,13 +48,23 @@ const matchesWithCurrentRoute = (routeName: string) => {
       </div>
     </RouterLink>
     <div class="w-[600px] flex flex-row justify-end">
-      <div v-if="authStore.isLoggedIn" class="flex items-center gap-2">
-        <div class="p-2 rounded-xl bg-orange-200 flex items-center gap-2">
+      <div v-if="authStore.isLoggedIn" class="relative">
+        <div class="p-2 rounded-xl bg-orange-200 flex items-center gap-2 cursor-pointer select-none" @click="toggleUserMenuDropdown" data-testid="user-selector">
           <FontAwesomeIcon :icon="faUserCircle" class="text-md" />
           <span class="text-md font-medium" data-testid="welcome-message">{{
             authStore.user.name
           }}</span>
-          <FontAwesomeIcon :icon="faChevronDown" class="text-md" />
+          <FontAwesomeIcon :icon="faChevronDown" :class="{ 'transform rotate-180 duration-300': isUserMenuDropdownOpen }" class="text-md" />
+        </div>
+        <div v-if="isUserMenuDropdownOpen" class="absolute right-0 max-w-[300px] -bottom-[80px] p-2 flex flex-col gap-2 bg-orange-200 rounded-xl" data-testid="user-dropdown">
+          <div class="flex items-center justify-end gap-2">
+            <FontAwesomeIcon :icon="faEnvelope" class="text-md" />
+            <span class="text-md font-medium">{{authStore.user.email}}</span>
+          </div>
+          <div class="flex items-center justify-end gap-2 text-right cursor-pointer" @click="onClickLogout" data-testid="logout-button">
+            <FontAwesomeIcon :icon="faRightFromBracket" class="text-md" />
+            <span class="text-md font-medium">Cerrar sesión</span>
+          </div>
         </div>
       </div>
       <div v-else class="flex items-center gap-2">

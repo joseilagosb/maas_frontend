@@ -28,13 +28,33 @@ export const useAuthStore = defineStore('auth', {
             const { data, headers } = response
             axios.defaults.headers.common['Authorization'] = headers.authorization
 
-            localStorage.setItem(USER_LOCAL_STORAGE_KEYS.USER, JSON.stringify(response.data))
+            localStorage.setItem(USER_LOCAL_STORAGE_KEYS.USER, JSON.stringify(response.data.user))
+
             this.user = data.user
             this.isLoggedIn = true
           }
         })
         .catch((error: Error) => {
-          console.log(error.message)
+          throw error
+        })
+    },
+    async logout() {
+      if (!this.isLoggedIn) {
+        return
+      }
+
+      return axios
+        .delete('http://localhost:3000/logout')
+        .then((response) => {
+          if (response && response.data) {
+            localStorage.removeItem(USER_LOCAL_STORAGE_KEYS.USER)
+            axios.defaults.headers.common['Authorization'] = ''
+            this.user = NULL_OBJECTS.USER
+            this.isLoggedIn = false
+          }
+        })
+        .catch((error: Error) => {
+          throw error
         })
     }
   }
