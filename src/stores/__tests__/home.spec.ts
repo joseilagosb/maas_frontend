@@ -12,9 +12,11 @@ describe('Home Store', () => {
     homeStore.$patch({ services: [] })
   })
 
-  it('fetches the services', async () => {
-    expect(homeStore.services).toEqual([])
-    await homeStore.fetchServices()
-    expect(homeStore.services).toEqual(testData.services)
+  describe('fetchServices', () => {
+    it('fetches the services', async () => {
+      expect(homeStore.services).toEqual([])
+      await homeStore.fetchServices()
+      expect(homeStore.services).toEqual(testData.services)
+    })
   })
 })

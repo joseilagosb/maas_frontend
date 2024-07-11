@@ -19,6 +19,10 @@ const getDefaultState = () => {
 
 export const useAuthStore = defineStore('auth', {
   state: (): AuthState => getDefaultState(),
+  getters: {
+    isAdmin: (state: AuthState) => state.user.role === 'admin',
+    isUser: (state: AuthState) => state.user.role === 'user'
+  },
   actions: {
     async login(email: string, password: string) {
       return axios

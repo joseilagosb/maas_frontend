@@ -13,7 +13,7 @@ export const useHomeStore = defineStore('home', {
         .then((response) => {
           this.services = response.data
         })
-        .catch((error) => {
+        .catch((error: Error) => {
           throw error
         })
     }
