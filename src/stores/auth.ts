@@ -26,8 +26,8 @@ export const useAuthStore = defineStore('auth', {
         .then((response) => {
           if (response && response.data) {
             const { data, headers } = response
-            axios.defaults.headers.common['Authorization'] = headers.authorization
 
+            localStorage.setItem(USER_LOCAL_STORAGE_KEYS.TOKEN, headers.authorization.split(' ')[1])
             localStorage.setItem(USER_LOCAL_STORAGE_KEYS.USER, JSON.stringify(response.data.user))
 
             this.user = data.user
@@ -48,7 +48,7 @@ export const useAuthStore = defineStore('auth', {
         .then((response) => {
           if (response && response.data) {
             localStorage.removeItem(USER_LOCAL_STORAGE_KEYS.USER)
-            axios.defaults.headers.common['Authorization'] = ''
+            localStorage.removeItem(USER_LOCAL_STORAGE_KEYS.TOKEN)
             this.user = NULL_OBJECTS.USER
             this.isLoggedIn = false
           }

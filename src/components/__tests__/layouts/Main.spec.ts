@@ -72,7 +72,7 @@ describe('MainLayout', () => {
 
     it.todo('closes the user dropdown when the user clicks outside of it')
 
-    it('logs out when the user clicks on the logout button', async () => {
+    it('sends back to login when the user clicks on the logout button', async () => {
       const updatedWrapper = shallowMountWithPinia(MainLayout, {
         initialState: initialLoggedInState,
         stubActions: false

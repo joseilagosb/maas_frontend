@@ -3,3 +3,10 @@ export type User = {
   name: string
   email: string
 }
+
+export type Service = {
+  id: number
+  name: string
+  from: string
+  to: string
+}

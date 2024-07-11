@@ -1,4 +1,4 @@
-import { describe } from 'node:test'
+import { before, beforeEach, describe } from 'node:test'
 import { beforeAll, expect, it } from 'vitest'
 
 import { shallowMount } from '@vue/test-utils'
@@ -25,18 +25,32 @@ describe('router', async () => {
     wrapper = shallowMount(App, { global: { plugins: [pinia, mockRouter] } })
   })
 
-  it('redirects to login when the user is not logged in', () => {
-    mockRouter.push('/').then(() => {
-      expect(wrapper.vm.$route.path).toBe('/login')
+  describe('when the user is not logged in', () => {
+    it('redirects to login', () => {
+      mockRouter.push('/').then(() => {
+        expect(wrapper.vm.$route.path).toBe('/login')
+      })
     })
   })
 
-  it('continues to the next route when the user is logged in', () => {
-    const authStore = useAuthStore()
-    authStore.$patch({ isLoggedIn: true })
+  describe('when the user is logged in', async () => {
+    it('continues to the next route', () => {
+      const authStore = useAuthStore()
+      authStore.$patch({ isLoggedIn: true })
 
-    mockRouter.push('/').then(() => {
-      expect(wrapper.vm.$route.path).toBe('/')
+      mockRouter.push('/').then(() => {
+        expect(wrapper.vm.$route.path).toBe('/')
+      })
+    })
+
+    it('redirects to services when the user is logged in', async () => {
+      await mockRouter.isReady()
+      const authStore = useAuthStore()
+      authStore.$patch({ isLoggedIn: true })
+
+      mockRouter.push('/').then(() => {
+        expect(wrapper.vm.$route.path).toBe('/services')
+      })
     })
   })
 })
