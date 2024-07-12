@@ -25,6 +25,7 @@
     "dayjs": "^1.11.11",
     "pinia": "^2.1.7",
     "vue": "^3.4.29",
+    "vue-i18n": "^9.13.1",
     "vue-router": "^4.3.3"
   },
   "devDependencies": {

@@ -1,4 +1,5 @@
 import type { Service, User } from './models'
+import dayjs from 'dayjs'
 
 export type AuthState = {
   isLoggedIn: boolean
@@ -11,4 +12,6 @@ export type HomeState = {
 
 export type ServiceState = {
   service?: Service
+  selectedWeek: number
+  weeks: number[]
 }

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, watchEffect } from 'vue'
+import { computed, ref, toRefs, watchEffect } from 'vue'
 import { useRoute } from 'vue-router'
 import { storeToRefs } from 'pinia'
 
@@ -8,22 +8,20 @@ import weekOfYear from 'dayjs/plugin/weekOfYear'
 dayjs.extend(weekOfYear)
 
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
-import { faCalendarCheck, faClock } from '@fortawesome/free-regular-svg-icons'
+import { faClock } from '@fortawesome/free-regular-svg-icons'
 import { faCalendarDay } from '@fortawesome/free-solid-svg-icons'
 
 import { useServiceStore } from '@/stores/service'
-import { useAuthStore } from '@/stores/auth'
 
 const loading = ref(true)
 const isErrorVisible = ref(false)
 
-const selectedWeek = ref(dayjs().week())
-const weeks = ref(Array.from(Array(dayjs().week() + 6).keys()))
+const serviceStore = useServiceStore()
+const { service, from, to, weeks, selectedWeek } = storeToRefs(serviceStore)
+
+console.log(from, to)
 
 const route = useRoute()
-const authStore = useAuthStore()
-const serviceStore = useServiceStore()
-const { service } = storeToRefs(serviceStore)
 
 watchEffect(() => {
   serviceStore
@@ -41,11 +39,7 @@ watchEffect(() => {
   <div v-if="loading" class="flex flex-col gap-4 items-start justify-start">
     <h1 class="text-2xl font-bold">Cargando...</h1>
   </div>
-  <div
-    v-else-if="service"
-    class="size-full flex flex-col gap-4 items-start justify-start p-2"
-    data-testid="service"
-  >
+  <div v-else-if="service" class="size-full flex flex-col gap-4 items-start justify-start p-2" data-testid="service">
     <div class="w-full flex justify-between items-start pt-8">
       <div class="flex flex-col items-left gap-4">
         <h1 class="text-4xl font-light">
@@ -57,14 +51,14 @@ watchEffect(() => {
     </div>
     <div class="size-full flex flex-row gap-4">
       <div class="w-[20%] flex flex-col gap-1">
-        <select class="px-4 py-2 bg-orange-300 rounded-lg" v-model="selectedWeek">
-          <option v-for="week in weeks" :key="week" :value="week">
+        <select class="px-4 py-2 bg-orange-300 rounded-lg transition duration-500 hover:bg-orange-400"
+          v-model="selectedWeek">
+          <option class="bg-orange-300" v-for="week in weeks" :key="week" :value="week">
             {{ `Semana ${week} del ${dayjs().year()}` }}
           </option>
         </select>
         <p class="font-light text-sm text-gray-500 pl-5">
-          del {{ dayjs().format('DD/MM/YYYY') }} al
-          {{ dayjs().add(1, 'week').format('DD/MM/YYYY') }}
+          del {{ from.format('DD/MM/YYYY') }} al {{ to.format('DD/MM/YYYY') }}
         </p>
         <h3 class="text-2xl font-light text-gray-500 pt-4">
           <FontAwesomeIcon :icon="faClock" class="text-md pr-2" />
@@ -87,8 +81,7 @@ watchEffect(() => {
         </div>
       </div>
       <div
-        class="w-[80%] grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-2 overflow-y-auto tiny-scrollbar"
-      >
+        class="w-[80%] grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 auto-rows-max gap-2 overflow-y-auto tiny-scrollbar">
         <slot name="grid"></slot>
       </div>
     </div>
