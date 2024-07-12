@@ -3,7 +3,6 @@ import { useRouter } from 'vue-router'
 
 import MainLayout from '@/components/layouts/Main.vue'
 
-import { NULL_OBJECTS } from '@/utils/constants'
 import { shallowMountWithPinia } from '@/test/utils'
 import { mockUseRouter } from '@/test/mocks/use_router'
 import { testState } from '@/test/data'

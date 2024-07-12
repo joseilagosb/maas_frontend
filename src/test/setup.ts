@@ -1,6 +1,7 @@
 import { afterAll, beforeAll, vi } from 'vitest'
 import localStorageMock from './mocks/local_storage'
 import { mockAxios } from './mocks/axios'
+import { beforeEach } from 'node:test'
 
 let originalLocalStorage: Storage
 

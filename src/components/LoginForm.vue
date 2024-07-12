@@ -49,7 +49,7 @@ watchEffect(() => {
       <h4 class="text-md text-yellow-800">
         {{
           redirected === 'loggedout'
-            ? 'Has cerrado sesión correctamente.'
+            ? 'Has cerrado sesión con éxito.'
             : 'Debes iniciar sesión para acceder a esta página.'
         }}
       </h4>

@@ -3,6 +3,7 @@ import { useAuthStore } from '@/stores/auth'
 
 import LoginView from '@/views/LoginView.vue'
 import ServicesView from '../views/ServicesView.vue'
+import ServiceView from '../views/ServiceView.vue'
 
 export const routes = [
   {
@@ -14,6 +15,11 @@ export const routes = [
     path: '/services',
     name: 'services',
     component: ServicesView
+  },
+  {
+    path: '/services/:id',
+    name: 'service',
+    component: ServiceView
   },
   {
     path: '/login',

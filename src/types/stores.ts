@@ -8,3 +8,7 @@ export type AuthState = {
 export type HomeState = {
   services: Service[]
 }
+
+export type ServiceState = {
+  service?: Service
+}

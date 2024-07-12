@@ -21,6 +21,28 @@ export const testData = {
   ]
 }
 
+export const testResponses = {
+  services: {
+    200: {
+      data: [
+        { attributes: { ...testData.services[0] } },
+        { attributes: { ...testData.services[1] } }
+      ]
+    }
+  },
+  service: {
+    200: {
+      data: { attributes: { ...testData.services[0] } }
+    }
+  },
+  logout: {
+    200: {
+      data: { status: 200, message: 'Logged out successfully' },
+      status: 200
+    }
+  }
+}
+
 export const testState = {
   notLoggedIn: { auth: { isLoggedIn: false, user: null } },
   admin: { auth: { isLoggedIn: true, user: { ...testData.admin } } },

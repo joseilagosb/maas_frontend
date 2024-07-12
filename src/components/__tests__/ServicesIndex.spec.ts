@@ -5,26 +5,18 @@ import { createTestingPinia } from '@pinia/testing'
 
 import ServicesIndex from '../ServicesIndex.vue'
 
-import { testData, testState } from '@/test/data'
+import { testData, testResponses, testState } from '@/test/data'
 
 describe('ServicesIndex', () => {
   const errorMessageSelector = '[data-testid="error-message"]'
   const servicesSelector = '[data-testid="services"]'
   const serviceSelector = '[data-testid="service"]'
 
-  vi.mock('axios')
-  vi.mock('vue-router')
-
   afterEach(() => {
     vi.restoreAllMocks()
   })
 
   it('shows services when the fetch is successful', async () => {
-    vi.mocked(axios.get).mockImplementation(async (url) => {
-      if (url === 'http://localhost:3000/services') {
-        return Promise.resolve({ data: testData.services })
-      }
-    })
     const wrapper = mount(ServicesIndex, {
       global: {
         plugins: [createTestingPinia({ initialState: { ...testState.user }, stubActions: false })]
@@ -58,7 +50,7 @@ describe('ServicesIndex', () => {
     it('opens the service page', async () => {
       vi.mocked(axios.get).mockImplementation(async (url) => {
         if (url === 'http://localhost:3000/services') {
-          return Promise.resolve({ data: testData.services })
+          return Promise.resolve(testResponses.services[200])
         }
       })
 
