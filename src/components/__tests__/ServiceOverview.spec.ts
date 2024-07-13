@@ -6,6 +6,7 @@ import { flushPromises, shallowMount } from '@vue/test-utils'
 
 import { testData, testState } from '@/test/data'
 import ServiceOverview from '../ServiceOverview.vue'
+import dayjs from 'dayjs'
 
 describe('ServiceOverview', () => {
   vi.mock('vue-router')
@@ -32,6 +33,12 @@ describe('ServiceOverview', () => {
   })
 
   it('shows an error message when the fetch fails', async () => {
+    vi.mocked(dayjs).mockImplementation(
+      () =>
+        ({
+          week: vi.fn().mockReturnValue(10)
+        }) as any
+    )
     vi.mocked(useRoute).mockReturnValue({ params: { id: service.id } } as any)
     vi.mocked(axios.get).mockImplementation(async (url) => {
       if (url === `http://localhost:3000/services/${service.id}`) {

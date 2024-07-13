@@ -5,7 +5,6 @@ export const mockAxios = {
   get: vi.fn().mockImplementation((url) => {
     switch (url) {
       case `http://localhost:3000/services/${testData.services[0].id}`: {
-        console.log('hola')
         return Promise.resolve(testResponses.service[200])
       }
       case 'http://localhost:3000/services':

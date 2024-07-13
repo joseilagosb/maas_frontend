@@ -16,8 +16,25 @@ export const testData = {
     role: 'admin'
   } as const,
   services: [
-    { id: 1, name: 'service1' },
-    { id: 2, name: 'service2' }
+    { id: 1, name: 'service1', active: true },
+    { id: 2, name: 'service2', active: true }
+  ],
+  serviceWeeks: [
+    {
+      id: 1,
+      week: 1,
+      serviceDays: [{ id: 1, day: 1, serviceHours: [{ id: 1, hour: 1, user: { id: 1 } }] }]
+    },
+    {
+      id: 2,
+      week: 2,
+      serviceDays: [{ id: 1, day: 1, serviceHours: [{ id: 1, hour: 1, user: { id: 1 } }] }]
+    },
+    {
+      id: 3,
+      week: 3,
+      serviceDays: [{ id: 1, day: 1, serviceHours: [{ id: 1, hour: 1, user: { id: 1 } }] }]
+    }
   ]
 }
 
@@ -32,7 +49,7 @@ export const testResponses = {
   },
   service: {
     200: {
-      data: { attributes: { ...testData.services[0] } }
+      data: { ...testData.services[0], type: 'service' }
     }
   },
   logout: {
