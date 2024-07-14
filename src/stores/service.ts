@@ -1,18 +1,21 @@
 import axios from 'axios'
 import dayjs from 'dayjs'
 import { defineStore } from 'pinia'
-
-import type { ServiceState } from '@/types/stores'
+import { useRoute } from 'vue-router'
 
 import { JSONDeserializer } from '@/services/deserializer'
 import { firstDayOfWeek, lastDayOfWeek } from '@/utils/dayjs'
 import { getArrayFromInterval } from '@/utils/common'
+
+import type { ServiceState } from '@/types/stores'
 import type { ServiceDay, ServiceHour, ServiceWeek } from '@/types/models'
 
 const getDefaultServiceState = (): ServiceState => {
-  const selectedWeek = dayjs().week()
+  const route = useRoute()
+  const selectedWeek = route.params.week ? +route.params.week : dayjs().week()
   return {
     service: undefined,
+    users: [],
     weeks: [],
     selectedWeek,
     selectedWeekData: undefined
@@ -24,7 +27,9 @@ export const useServiceStore = defineStore('service', {
   getters: {
     from: (state: ServiceState) => firstDayOfWeek(state.selectedWeek),
     to: (state: ServiceState) => lastDayOfWeek(state.selectedWeek),
-    weekContainsData: (state: ServiceState) => state.weeks.includes(state.selectedWeek)
+    weekContainsData: (state: ServiceState) => {
+      return state.weeks.includes(state.selectedWeek)
+    }
   },
   actions: {
     async fetchService(id: number) {
@@ -48,16 +53,29 @@ export const useServiceStore = defineStore('service', {
         })
     },
     async fetchServiceWeek(id: number, week: number) {
-      return axios
-        .get(`http://localhost:3000/services/${id}/service_weeks/${week}`)
-        .then(async (response) => {
+      const route = useRoute()
+      console.log(route.name)
+      let url = `http://localhost:3000/services/${id}/service_weeks/${week}`
+      if (route.name === 'edit-availability') {
+        url += '/edit'
+      }
+
+      console.log(url)
+
+      try {
+        await axios.get(url).then(async (response) => {
           const parsedResponseData = response.data
           const selectedWeekData = await JSONDeserializer.deserialize(parsedResponseData)
           this.selectedWeekData = selectedWeekData
         })
-        .catch((error: Error) => {
-          throw error
+        await axios.get(`http://localhost:3000/users`).then(async (response) => {
+          const parsedResponseData = response.data
+          const users = await JSONDeserializer.deserialize(parsedResponseData)
+          this.users = users
         })
+      } catch (error) {
+        throw error
+      }
     },
     generateEmptyServiceWeek() {
       const serviceWorkingDays = this.service!.serviceWorkingDays
@@ -74,7 +92,7 @@ export const useServiceStore = defineStore('service', {
               const serviceHour: ServiceHour = {
                 id: 0,
                 hour,
-                user: undefined
+                designatedUser: undefined
               }
               return serviceHour
             })

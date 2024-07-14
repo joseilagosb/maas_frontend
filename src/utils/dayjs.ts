@@ -2,12 +2,17 @@ import dayjs from 'dayjs'
 import 'dayjs/locale/es'
 import weekOfYear from 'dayjs/plugin/weekOfYear'
 
-export const applyWeekOfYearPlugin = (dayjsInstance: typeof dayjs) => {
+const withWeekOfYearPlugin = (dayjsInstance: typeof dayjs) => {
   dayjsInstance.extend(weekOfYear)
 }
 
-export const applySpanishLocale = (dayjsInstance: typeof dayjs) => {
+const withSpanishLocale = (dayjsInstance: typeof dayjs) => {
   dayjsInstance.locale('es')
+}
+
+export const applyPlugins = (dayjsInstance: typeof dayjs) => {
+  withWeekOfYearPlugin(dayjsInstance)
+  withSpanishLocale(dayjsInstance)
 }
 
 export const firstDayOfWeek = (week: number) => {

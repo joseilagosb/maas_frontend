@@ -1,24 +1,23 @@
 <script setup lang="ts">
-import { computed, ref, watchEffect } from 'vue'
+import { computed, ref, watch, watchEffect } from 'vue'
 import { useRoute } from 'vue-router'
 import { storeToRefs } from 'pinia'
-
 import dayjs from 'dayjs'
-applyWeekOfYearPlugin(dayjs)
 
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 import { faClock } from '@fortawesome/free-regular-svg-icons'
 import { faCalendarDay } from '@fortawesome/free-solid-svg-icons'
 
 import { useServiceStore } from '@/stores/service'
-import { applyWeekOfYearPlugin, formatDate } from '@/utils/dayjs'
 import { getArrayFromInterval } from '@/utils/common'
+import { formatDate } from '@/utils/dayjs'
+import { onMounted } from 'vue'
 
 const loading = ref(true)
 const isErrorVisible = ref(false)
 
 const serviceStore = useServiceStore()
-const { service, from, to, selectedWeek, weeks } = storeToRefs(serviceStore)
+const { service, from, to, selectedWeek, weeks, weekContainsData } = storeToRefs(serviceStore)
 
 const weekOptions = computed(() => {
   const lastServiceWeek = weeks.value[weeks.value.length - 1]
@@ -55,7 +54,7 @@ watchEffect(() => {
           {{ service.name }}
         </h1>
       </div>
-      <slot name="action-buttons"></slot>
+      <div class="flex flex-row gap-2"><slot name="action-buttons"></slot></div>
     </div>
     <div class="size-full flex flex-row gap-4">
       <div class="w-[20%] flex flex-col gap-1">

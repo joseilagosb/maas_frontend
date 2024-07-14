@@ -4,6 +4,7 @@ import { useAuthStore } from '@/stores/auth'
 import LoginView from '@/views/LoginView.vue'
 import ServicesView from '../views/ServicesView.vue'
 import ServiceView from '../views/ServiceView.vue'
+import EditAvailabilityServiceView from '@/views/EditAvailabilityServiceView.vue'
 
 export const routes = [
   {
@@ -20,6 +21,11 @@ export const routes = [
     path: '/services/:id',
     name: 'service',
     component: ServiceView
+  },
+  {
+    path: '/services/:id/edit/:week',
+    name: 'edit-availability',
+    component: EditAvailabilityServiceView
   },
   {
     path: '/login',

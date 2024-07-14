@@ -1,4 +1,4 @@
-import type { Service, ServiceWeek, User } from './models'
+import type { CurrentAvailability, Service, ServiceWeek, User } from './models'
 
 export type AuthState = {
   isLoggedIn: boolean
@@ -11,7 +11,12 @@ export type HomeState = {
 
 export type ServiceState = {
   service?: Service
+  users: User[]
   weeks: number[]
   selectedWeek: number
   selectedWeekData?: ServiceWeek
+}
+
+export type ServiceAvailabilityState = {
+  currentAvailability?: CurrentAvailability
 }
