@@ -52,30 +52,33 @@ export const useServiceStore = defineStore('service', {
           throw error
         })
     },
-    async fetchServiceWeek(id: number, week: number) {
-      const route = useRoute()
-      console.log(route.name)
-      let url = `http://localhost:3000/services/${id}/service_weeks/${week}`
-      if (route.name === 'edit-availability') {
-        url += '/edit'
-      }
-
-      console.log(url)
-
-      try {
-        await axios.get(url).then(async (response) => {
-          const parsedResponseData = response.data
-          const selectedWeekData = await JSONDeserializer.deserialize(parsedResponseData)
-          this.selectedWeekData = selectedWeekData
-        })
-        await axios.get(`http://localhost:3000/users`).then(async (response) => {
+    async fetchUsers() {
+      await axios
+        .get(`http://localhost:3000/users`)
+        .then(async (response) => {
           const parsedResponseData = response.data
           const users = await JSONDeserializer.deserialize(parsedResponseData)
           this.users = users
         })
-      } catch (error) {
-        throw error
+        .catch((error: Error) => {
+          throw error
+        })
+    },
+    async fetchServiceWeek(id: number, mode: 'show' | 'edit' = 'show') {
+      let url = `http://localhost:3000/services/${id}/service_weeks/${this.selectedWeek}`
+      if (mode === 'edit') {
+        url += '/edit'
       }
+      await axios
+        .get(url)
+        .then(async (response) => {
+          const parsedResponseData = response.data
+          const selectedWeekData = await JSONDeserializer.deserialize(parsedResponseData)
+          this.selectedWeekData = selectedWeekData
+        })
+        .catch((error: Error) => {
+          throw error
+        })
     },
     generateEmptyServiceWeek() {
       const serviceWorkingDays = this.service!.serviceWorkingDays

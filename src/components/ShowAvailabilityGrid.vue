@@ -30,7 +30,7 @@ const refreshGrid = () => {
   isErrorVisible.value = false
 
   serviceStore
-    .fetchServiceWeek(+route.params.id, selectedWeek.value)
+    .fetchServiceWeek(+route.params.id)
     .catch(() => {
       isErrorVisible.value = true
     })

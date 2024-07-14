@@ -23,8 +23,14 @@ const { currentAvailability } = storeToRefs(serviceAvailabilityStore)
 const { users, weekContainsData, selectedWeek, selectedWeekData, from } = storeToRefs(serviceStore)
 
 const refreshGrid = () => {
+  serviceStore.fetchUsers().catch(() => {
+    isErrorVisible.value = true
+    return
+  })
+
   if (!weekContainsData.value) {
     serviceStore.generateEmptyServiceWeek()
+    serviceAvailabilityStore.generateEmptyCurrentAvailability()
     loading.value = false
     return
   }
@@ -33,12 +39,11 @@ const refreshGrid = () => {
   isErrorVisible.value = false
 
   serviceStore
-    .fetchServiceWeek(+route.params.id, selectedWeek.value)
+    .fetchServiceWeek(+route.params.id, 'edit')
     .catch(() => {
       isErrorVisible.value = true
     })
     .finally(() => {
-      serviceAvailabilityStore.generateCurrentAvailability()
       loading.value = false
     })
 }
@@ -86,11 +91,7 @@ watch([selectedWeek], () => {
         <span class="text-sm font-bold">{{ user.name }}</span>
       </div>
     </div>
-    <div
-      v-for="({ hour, users: availableUsers }, hourIndex) in hours"
-      :key="hour"
-      class="flex flex-row w-full"
-    >
+    <div v-for="({ hour }, hourIndex) in hours" :key="hour" class="flex flex-row w-full">
       <div class="w-[30%] flex justify-center">
         <span class="text-sm text-light"
           >{{ getFormattedHour(hour) }}-{{ getFormattedHour(hour + 1) }}</span
@@ -103,10 +104,12 @@ watch([selectedWeek], () => {
         :class="[`${USER_TAILWIND_COLORS[user.color]}`]"
         :style="[`width: calc(${70 / users.length}%)`]"
       >
+        {{ console.log(currentAvailability) }}
         <input
           class="rounded size-5"
           type="checkbox"
           v-model="currentAvailability!.days[dayIndex].hours[hourIndex].available[userIndex]"
+          @change="serviceAvailabilityStore.changedAvailability = true"
           :disabled="+user.id !== authStore.user.id"
         />
       </div>

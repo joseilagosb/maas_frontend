@@ -19,4 +19,5 @@ export type ServiceState = {
 
 export type ServiceAvailabilityState = {
   currentAvailability?: CurrentAvailability
+  changedAvailability: boolean
 }

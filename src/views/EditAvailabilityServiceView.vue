@@ -1,22 +1,31 @@
 <script setup lang="ts">
+import { ref, watch } from 'vue'
+import { storeToRefs } from 'pinia'
 import { useRoute } from 'vue-router'
 
 import MainLayout from '@/components/layouts/Main.vue'
 import ServiceOverview from '@/components/ServiceOverview.vue'
 
 import { useAuthStore } from '@/stores/auth'
+import { useServiceAvailabilityStore } from '@/stores/service_availability'
 
 import { faArrowLeft } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 import { faPaperPlane } from '@fortawesome/free-regular-svg-icons'
 
 import EditAvailabilityGrid from '@/components/EditAvailabilityGrid.vue'
-import { ref } from 'vue'
 
 const route = useRoute()
 const authStore = useAuthStore()
 
 const saveButtonDisabled = ref(true)
+
+const serviceAvailabilityStore = useServiceAvailabilityStore()
+const { changedAvailability } = storeToRefs(serviceAvailabilityStore)
+
+watch([changedAvailability], () => {
+  saveButtonDisabled.value = false
+})
 </script>
 
 <template>
