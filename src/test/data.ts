@@ -1,3 +1,15 @@
+import { getArrayFromInterval } from '@/utils/common'
+
+export const testTime = {
+  date: {
+    inSpanish: '6 de marzo de 2024'
+  },
+  startOfWeek: 4,
+  endOfWeek: 10,
+  week: 10,
+  year: 2024
+}
+
 export const testData = {
   loginInput: {
     email: 'messi@maas.com',
@@ -5,6 +17,7 @@ export const testData = {
   } as const,
   user: {
     id: 1,
+    type: 'user',
     name: 'Messi',
     email: 'messi@maas.com',
     role: 'user'
@@ -16,48 +29,24 @@ export const testData = {
     role: 'admin'
   } as const,
   services: [
-    { id: 1, name: 'service1', active: true },
-    { id: 2, name: 'service2', active: true }
+    { id: 1, name: 'service1', active: true, type: 'service' },
+    { id: 2, name: 'service2', active: true, type: 'service' }
   ],
-  serviceWeeks: [
-    {
-      id: 1,
-      week: 1,
-      serviceDays: [{ id: 1, day: 1, serviceHours: [{ id: 1, hour: 1, user: { id: 1 } }] }]
-    },
-    {
-      id: 2,
-      week: 2,
-      serviceDays: [{ id: 1, day: 1, serviceHours: [{ id: 1, hour: 1, user: { id: 1 } }] }]
-    },
-    {
-      id: 3,
-      week: 3,
-      serviceDays: [{ id: 1, day: 1, serviceHours: [{ id: 1, hour: 1, user: { id: 1 } }] }]
-    }
-  ]
-}
-
-export const testResponses = {
-  services: {
-    200: {
-      data: [
-        { attributes: { ...testData.services[0] } },
-        { attributes: { ...testData.services[1] } }
-      ]
-    }
-  },
-  service: {
-    200: {
-      data: { ...testData.services[0], type: 'service' }
-    }
-  },
-  logout: {
-    200: {
-      data: { status: 200, message: 'Logged out successfully' },
-      status: 200
-    }
-  }
+  serviceWorkingDays: getArrayFromInterval(testTime.startOfWeek, testTime.endOfWeek).map(
+    (day: number, index: number) => ({
+      id: index + 1,
+      day: day,
+      from: 10,
+      to: 22
+    })
+  ),
+  serviceWeeks: [{ id: 1, type: 'service_week', week: 1 }],
+  serviceDays: getArrayFromInterval(1, 7).map((day: number) => ({ type: 'service_day', day: day })),
+  serviceHours: getArrayFromInterval(1, 24).map((hour: number) => ({
+    type: 'hour',
+    hour: hour,
+    user: { id: 1 }
+  }))
 }
 
 export const testState = {

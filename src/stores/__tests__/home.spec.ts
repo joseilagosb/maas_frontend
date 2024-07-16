@@ -1,4 +1,4 @@
-import { expect, beforeEach, describe, it, vi } from 'vitest'
+import { expect, beforeEach, describe, it } from 'vitest'
 
 import { useHomeStore } from '../home'
 import { createPinia } from 'pinia'

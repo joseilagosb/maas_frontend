@@ -1,9 +1,8 @@
 <script setup lang="ts">
 import { RouterView } from 'vue-router'
 
-import dayjs from 'dayjs'
-import { applyPlugins } from './utils/dayjs'
-applyPlugins(dayjs)
+import { applyDatePlugins } from './services/date'
+applyDatePlugins()
 </script>
 
 <template>

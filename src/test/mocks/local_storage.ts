@@ -1,4 +1,4 @@
-const localStorageMock: Storage = (() => {
+export const mockLocalStorage: Storage = (() => {
   let store: Record<string, string> = {}
 
   return {
@@ -16,5 +16,3 @@ const localStorageMock: Storage = (() => {
     length: Object.keys(store).length
   }
 })()
-
-export default localStorageMock

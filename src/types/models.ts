@@ -12,10 +12,10 @@ export type Service = {
   id: number
   name: string
   active: boolean
-  serviceWorkingDays: ServiceWorkingDays[]
+  serviceWorkingDays: ServiceWorkingDay[]
 }
 
-type ServiceWorkingDays = {
+export type ServiceWorkingDay = {
   id: number
   day: number
   from: number

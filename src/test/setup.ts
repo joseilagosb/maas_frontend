@@ -1,42 +1,28 @@
 import { afterAll, beforeAll, vi } from 'vitest'
-import localStorageMock from './mocks/local_storage'
-import { mockAxios } from './mocks/axios'
-import { testData } from './data'
+
+import { mockLocalStorage } from './mocks/local_storage'
 import { mockJSONAPISerializer } from './mocks/jsonapi_serializer'
-import { mockDayjs } from './mocks/dayjs'
-import { formatDate } from '@/utils/dayjs'
+import { mockDateService } from './mocks/services/date'
+import { mockAPIService } from './mocks/services/api'
 
 let originalLocalStorage: Storage
 
 console.log('[test/setup] Configuración de pruebas iniciada.')
 
-// Se crean mocks para el método 'DELETE' de axios
-vi.mock('axios', async () => {
-  const axios = await vi.importActual('axios')
+vi.mock('jsonapi-serializer', () => mockJSONAPISerializer)
+vi.mock('@/services/date', () => mockDateService)
+vi.mock('@/services/api', async (importOriginal) => {
+  const originalModule = await importOriginal<typeof import('@/services/api')>()
   return {
-    ...axios,
-    default: {
-      ...(axios.default as object),
-      ...mockAxios
-    }
+    ...originalModule,
+    ...mockAPIService
   }
 })
-
-vi.mock('jsonapi-serializer', () => mockJSONAPISerializer)
-
-vi.mock('dayjs', () => mockDayjs)
-vi.mock('@/utils/dayjs', () => ({
-  applyWeekOfYearPlugin: (dayjs: any) => dayjs,
-  applySpanishLocale: (dayjs: any) => dayjs,
-  firstDayOfWeek: () => 12,
-  lastDayOfWeek: () => 18,
-  formatDate: (date: any, format: string) => '12/07/2024'
-}))
 
 // Se configura localStorage para que se ocupe en su lugar el mock localStorageMock
 beforeAll((): void => {
   originalLocalStorage = window.localStorage
-  ;(window as any).localStorage = localStorageMock
+  ;(window as any).localStorage = mockLocalStorage
 })
 afterAll((): void => {
   ;(window as any).localStorage = originalLocalStorage

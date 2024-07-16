@@ -8,6 +8,7 @@ export const mockJSONAPISerializer = {
         if (data.type === 'service') {
           return {
             ...testData.services[0],
+            serviceWorkingDays: [...testData.serviceWorkingDays],
             serviceWeeks: [...testData.serviceWeeks]
           }
         }
