@@ -1,12 +1,13 @@
-import axios from 'axios'
 import { describe, it, expect, vi, afterEach } from 'vitest'
 import { useRoute } from 'vue-router'
 import { createTestingPinia } from '@pinia/testing'
 import { flushPromises, shallowMount } from '@vue/test-utils'
 
-import { testData, testState } from '@/test/data'
 import ServiceOverview from '../ServiceOverview.vue'
-import dayjs from 'dayjs'
+
+import { getService } from '@/services/api'
+
+import { testData, testState } from '@/test/data'
 
 describe('ServiceOverview', () => {
   vi.mock('vue-router')
@@ -15,7 +16,9 @@ describe('ServiceOverview', () => {
   const errorMessageSelector = '[data-testid="error-message"]'
 
   afterEach(() => {
-    vi.restoreAllMocks()
+    vi.mocked(getService).mockImplementation(async () => {
+      return Promise.resolve(service)
+    })
   })
 
   it('shows the service when the fetch is successful', async () => {
@@ -33,17 +36,9 @@ describe('ServiceOverview', () => {
   })
 
   it('shows an error message when the fetch fails', async () => {
-    vi.mocked(dayjs).mockImplementation(
-      () =>
-        ({
-          week: vi.fn().mockReturnValue(10)
-        }) as any
-    )
     vi.mocked(useRoute).mockReturnValue({ params: { id: service.id } } as any)
-    vi.mocked(axios.get).mockImplementation(async (url) => {
-      if (url === `http://localhost:3000/services/${service.id}`) {
-        return Promise.reject(new Error('error'))
-      }
+    vi.mocked(getService).mockImplementation(async () => {
+      return Promise.reject(new Error('error'))
     })
 
     const wrapper = shallowMount(ServiceOverview, {

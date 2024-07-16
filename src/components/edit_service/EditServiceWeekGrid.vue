@@ -1,15 +1,15 @@
 <script setup lang="ts">
+import { onMounted, ref, watch } from 'vue'
+import { storeToRefs } from 'pinia'
+import { useRoute } from 'vue-router'
+
 import { useServiceStore } from '@/stores/service'
+import { useAuthStore } from '@/stores/auth'
+import { useServiceAvailabilityStore } from '@/stores/service_availability'
 
 import { getFormattedHour } from '@/utils/common'
 import { USER_TAILWIND_COLORS } from '@/utils/constants'
-
-import { storeToRefs } from 'pinia'
-import { useAuthStore } from '@/stores/auth'
-import { onMounted, ref, watch } from 'vue'
-import { useRoute } from 'vue-router'
-import { useServiceAvailabilityStore } from '@/stores/service_availability'
-import { addToDate, formatDateInSpanish } from '@/utils/dayjs'
+import { addToDate, formatDateInSpanish } from '@/services/date'
 
 const loading = ref(true)
 const isErrorVisible = ref(false)
@@ -23,7 +23,7 @@ const { currentAvailability } = storeToRefs(serviceAvailabilityStore)
 const { users, weekContainsData, selectedWeek, selectedWeekData, from } = storeToRefs(serviceStore)
 
 const refreshGrid = () => {
-  serviceStore.fetchUsers().catch(() => {
+  serviceStore.fetchWeekUsersCount().catch(() => {
     isErrorVisible.value = true
     return
   })
@@ -44,6 +44,7 @@ const refreshGrid = () => {
       isErrorVisible.value = true
     })
     .finally(() => {
+      serviceAvailabilityStore.generateCurrentAvailability()
       loading.value = false
     })
 }
@@ -104,7 +105,6 @@ watch([selectedWeek], () => {
         :class="[`${USER_TAILWIND_COLORS[user.color]}`]"
         :style="[`width: calc(${70 / users.length}%)`]"
       >
-        {{ console.log(currentAvailability) }}
         <input
           class="rounded size-5"
           type="checkbox"

@@ -2,11 +2,12 @@ import { defineStore } from 'pinia'
 import { useRoute } from 'vue-router'
 
 import { getService, getServiceWeek, getWeekUsersCount } from '@/services/api'
+
 import { firstDayOfWeek, getWeek, lastDayOfWeek } from '@/services/date'
-import { getArrayFromInterval } from '@/utils/common'
+import { getEmptyServiceWeekData } from './utils/service'
 
 import type { ServiceState } from '@/types/stores'
-import type { ServiceDay, ServiceHour, ServiceWeek } from '@/types/models'
+import type { ServiceWeek } from '@/types/models'
 
 const getDefaultServiceState = (): ServiceState => {
   const route = useRoute()
@@ -63,28 +64,7 @@ export const useServiceStore = defineStore('service', {
     },
     generateEmptyServiceWeek() {
       const serviceWorkingDays = this.service!.serviceWorkingDays
-
-      const serviceWeekData: ServiceWeek = {
-        id: 0,
-        week: this.selectedWeek,
-        serviceDays: serviceWorkingDays!.map((serviceWorkingDay: any) => {
-          const hoursArray = getArrayFromInterval(serviceWorkingDay.from, serviceWorkingDay.to)
-          const serviceDay: ServiceDay = {
-            id: 0,
-            day: serviceWorkingDay.day,
-            serviceHours: hoursArray.map((hour: any) => {
-              const serviceHour: ServiceHour = {
-                id: 0,
-                hour,
-                designatedUser: undefined
-              }
-              return serviceHour
-            })
-          }
-
-          return serviceDay
-        })
-      }
+      const serviceWeekData: ServiceWeek = getEmptyServiceWeekData(serviceWorkingDays!)
 
       this.selectedWeekData = serviceWeekData
     }

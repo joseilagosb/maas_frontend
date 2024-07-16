@@ -6,7 +6,7 @@ import { storeToRefs } from 'pinia'
 import { USER_TAILWIND_COLORS } from '@/utils/constants'
 import { getFormattedHour } from '@/utils/common'
 
-import { addToDate, formatDateInSpanish } from '@/utils/dayjs'
+import { addToDate, formatDateInSpanish } from '@/services/date'
 
 import { useServiceStore } from '@/stores/service'
 

@@ -1,8 +1,7 @@
 <script setup lang="ts">
 import { computed, ref, watchEffect } from 'vue'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { storeToRefs } from 'pinia'
-import dayjs from 'dayjs'
 
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 import { faClock } from '@fortawesome/free-regular-svg-icons'
@@ -10,7 +9,7 @@ import { faCalendarDay } from '@fortawesome/free-solid-svg-icons'
 
 import { useServiceStore } from '@/stores/service'
 import { getArrayFromInterval } from '@/utils/common'
-import { formatDate } from '@/utils/dayjs'
+import { formatDate, getYear } from '@/services/date'
 
 const loading = ref(true)
 const isErrorVisible = ref(false)
@@ -24,6 +23,11 @@ const weekOptions = computed(() => {
 })
 
 const route = useRoute()
+const router = useRouter()
+
+const onChangeWeek = () => {
+  router.replace({ params: { week: selectedWeek.value } })
+}
 
 watchEffect(() => {
   serviceStore
@@ -60,10 +64,10 @@ watchEffect(() => {
         <select
           class="px-4 py-2 bg-orange-300 rounded-lg transition duration-500 hover:bg-orange-400 disabled:bg-gray-300 hover:disabled:bg-gray-300"
           v-model="selectedWeek"
-          :disabled="route.name === 'edit-availability'"
+          @change="onChangeWeek"
         >
           <option class="bg-orange-300" v-for="week in weekOptions" :key="week" :value="week">
-            {{ `Semana ${week} del ${dayjs().year()}` }}
+            {{ `Semana ${week} del ${getYear()}` }}
           </option>
         </select>
         <p class="font-light text-sm text-gray-500 pl-5">

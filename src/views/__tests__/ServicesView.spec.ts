@@ -3,7 +3,7 @@ import { mount } from '@vue/test-utils'
 import { createTestingPinia } from '@pinia/testing'
 
 import ServicesView from '../ServicesView.vue'
-import ServicesIndex from '@/components/ServicesIndex.vue'
+import ServicesIndex from '@/components/services/ServicesIndex.vue'
 
 import { testData } from '@/test/data'
 

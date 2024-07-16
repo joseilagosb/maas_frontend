@@ -1,12 +1,20 @@
-import { createRouter, createWebHistory, type RouteLocationNormalizedGeneric } from 'vue-router'
+import {
+  createRouter,
+  createWebHistory,
+  type RouteLocationNormalizedGeneric,
+  type RouteRecordRaw
+} from 'vue-router'
+
 import { useAuthStore } from '@/stores/auth'
+
+import { getWeek } from '@/services/date'
 
 import LoginView from '@/views/LoginView.vue'
 import ServicesView from '../views/ServicesView.vue'
-import ServiceView from '../views/ServiceView.vue'
-import EditAvailabilityServiceView from '@/views/EditAvailabilityServiceView.vue'
+import ShowServiceWeekView from '../views/ShowServiceWeekView.vue'
+import EditServiceWeekView from '../views/EditServiceWeekView.vue'
 
-export const routes = [
+export const routes: Array<RouteRecordRaw> = [
   {
     path: '/',
     redirect: '/services',
@@ -20,12 +28,22 @@ export const routes = [
   {
     path: '/services/:id',
     name: 'service',
-    component: ServiceView
-  },
-  {
-    path: '/services/:id/edit/:week',
-    name: 'edit-availability',
-    component: EditAvailabilityServiceView
+    redirect: (to) => ({
+      name: 'show-service-week',
+      params: { id: to.params.id, week: getWeek() }
+    }),
+    children: [
+      {
+        path: 'week/:week',
+        name: 'show-service-week',
+        component: ShowServiceWeekView
+      },
+      {
+        path: 'week/:week/edit',
+        name: 'edit-service-week',
+        component: EditServiceWeekView
+      }
+    ]
   },
   {
     path: '/login',
