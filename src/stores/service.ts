@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia'
 import { useRoute } from 'vue-router'
 
-import { getService, getServiceWeek, getWeekUsersCount } from '@/services/api'
+import { getService, getServiceWeek, getUsers } from '@/services/api'
 
 import { firstDayOfWeek, getWeek, lastDayOfWeek } from '@/services/date'
 import { getEmptyServiceWeekData } from './utils/service'
@@ -15,7 +15,7 @@ const getDefaultServiceState = (): ServiceState => {
   return {
     service: undefined,
     users: [],
-    weeks: [],
+    activeWeeks: [],
     selectedWeek,
     selectedWeekData: undefined
   }
@@ -27,7 +27,7 @@ export const useServiceStore = defineStore('service', {
     from: (state: ServiceState) => firstDayOfWeek(state.selectedWeek),
     to: (state: ServiceState) => lastDayOfWeek(state.selectedWeek),
     weekContainsData: (state: ServiceState) => {
-      return state.weeks.includes(state.selectedWeek)
+      return state.activeWeeks.includes(state.selectedWeek)
     }
   },
   actions: {
@@ -40,15 +40,15 @@ export const useServiceStore = defineStore('service', {
           active: service.active,
           serviceWorkingDays: service.serviceWorkingDays
         }
-        const serviceWeeks = service.serviceWeeks.map((serviceWeek: any) => +serviceWeek.week)
-        this.weeks = serviceWeeks
+        const activeWeeks = service.serviceWeeks.map((serviceWeek: any) => +serviceWeek.week)
+        this.activeWeeks = activeWeeks
       } catch (error) {
         throw error
       }
     },
-    async fetchWeekUsersCount() {
+    async fetchUsers() {
       try {
-        const users = await getWeekUsersCount()
+        const users = await getUsers()
         this.users = users
       } catch (error) {
         throw error
@@ -64,7 +64,7 @@ export const useServiceStore = defineStore('service', {
     },
     generateEmptyServiceWeek() {
       const serviceWorkingDays = this.service!.serviceWorkingDays
-      const serviceWeekData: ServiceWeek = getEmptyServiceWeekData(serviceWorkingDays!)
+      const serviceWeekData: ServiceWeek = getEmptyServiceWeekData(serviceWorkingDays)
 
       this.selectedWeekData = serviceWeekData
     }

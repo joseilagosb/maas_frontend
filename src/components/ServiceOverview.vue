@@ -8,18 +8,26 @@ import { faClock } from '@fortawesome/free-regular-svg-icons'
 import { faCalendarDay } from '@fortawesome/free-solid-svg-icons'
 
 import { useServiceStore } from '@/stores/service'
-import { getArrayFromInterval } from '@/utils/common'
-import { formatDate, getYear } from '@/services/date'
+
+import { formatDate, getWeek, getYear } from '@/services/date'
+
+import { addToSortedArray, getArrayFromInterval } from '@/utils/common'
 
 const loading = ref(true)
 const isErrorVisible = ref(false)
 
 const serviceStore = useServiceStore()
-const { service, from, to, selectedWeek, weeks } = storeToRefs(serviceStore)
+const { service, from, to, selectedWeek, activeWeeks } = storeToRefs(serviceStore)
 
 const weekOptions = computed(() => {
-  const lastServiceWeek = weeks.value[weeks.value.length - 1]
-  return [...weeks.value, ...getArrayFromInterval(lastServiceWeek, lastServiceWeek + 5)]
+  const currentWeek = getWeek()
+
+  // Cinco semanas en el futuro
+  const additionalWeeks = getArrayFromInterval(currentWeek + 1, currentWeek + 5)
+
+  // Se retorna el intervalo de semanas actuales, más la semana actual insertada en el orden
+  // del array si no está incluida y las semanas adicionales al final
+  return [...addToSortedArray(activeWeeks.value, currentWeek), ...additionalWeeks]
 })
 
 const route = useRoute()
@@ -65,19 +73,23 @@ watchEffect(() => {
           class="px-4 py-2 bg-orange-300 rounded-lg transition duration-500 hover:bg-orange-400 disabled:bg-gray-300 hover:disabled:bg-gray-300"
           v-model="selectedWeek"
           @change="onChangeWeek"
+          data-testid="week-select"
         >
           <option class="bg-orange-300" v-for="week in weekOptions" :key="week" :value="week">
             {{ `Semana ${week} del ${getYear()}` }}
           </option>
         </select>
-        <p class="font-light text-sm text-gray-500 pl-5">
+        <p class="font-light text-sm text-gray-500 pl-5" data-testid="selected-week-range-text">
           del {{ formatDate(from, 'DD/MM/YYYY') }} al {{ formatDate(to, 'DD/MM/YYYY') }}
         </p>
         <h3 class="text-2xl font-light text-gray-500 pt-4">
           <FontAwesomeIcon :icon="faClock" class="text-md pr-2" />
           <span>Horas asignadas</span>
         </h3>
-        <div class="border border-black rounded-xl py-1 flex flex-col gap-1 overflow-hidden">
+        <div
+          class="border border-black rounded-xl py-1 flex flex-col gap-1 overflow-hidden"
+          data-testid="assigned-hours-count"
+        >
           <div class="h-[40px] w-full px-4 bg-green-400 flex items-center justify-between">
             <span class="font-light text-lg">Cristiano Ronaldo</span>
             <span class="font-light text-lg">19</span>

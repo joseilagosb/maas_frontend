@@ -12,7 +12,7 @@ export type HomeState = {
 export type ServiceState = {
   service?: Service
   users: User[]
-  weeks: number[]
+  activeWeeks: number[]
   selectedWeek: number
   selectedWeekData?: ServiceWeek
 }

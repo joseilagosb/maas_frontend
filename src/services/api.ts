@@ -48,7 +48,7 @@ export const getServices = async () => {
     })
 }
 
-export const getWeekUsersCount = async () => {
+export const getUsers = async () => {
   return axios
     .get(`http://localhost:3000/users`)
     .then(async (response) => {

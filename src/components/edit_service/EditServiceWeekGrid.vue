@@ -23,7 +23,7 @@ const { currentAvailability } = storeToRefs(serviceAvailabilityStore)
 const { users, weekContainsData, selectedWeek, selectedWeekData, from } = storeToRefs(serviceStore)
 
 const refreshGrid = () => {
-  serviceStore.fetchWeekUsersCount().catch(() => {
+  serviceStore.fetchUsers().catch(() => {
     isErrorVisible.value = true
     return
   })

@@ -6,11 +6,21 @@ import { testState } from '@/test/data'
 import ServicesActionButtons from '@/components/services/ServicesActionButtons.vue'
 
 describe('ServicesActionButtons', () => {
-  it('renders the New Service button when the user is an admin', () => {
-    const wrapper = shallowMount(ServicesActionButtons, {
-      global: { plugins: [createTestingPinia({ initialState: { ...testState.admin } })] }
+  describe('new service button', () => {
+    it('does not render when the user is not an admin', () => {
+      const wrapper = shallowMount(ServicesActionButtons, {
+        global: { plugins: [createTestingPinia({ initialState: { ...testState.user } })] }
+      })
+
+      expect(wrapper.find('[data-testid="new-service-button"]').exists()).toBe(false)
     })
 
-    expect(wrapper.find('[data-testid="new-service-button"]').exists()).toBe(true)
+    it('renders when the user is an admin', () => {
+      const wrapper = shallowMount(ServicesActionButtons, {
+        global: { plugins: [createTestingPinia({ initialState: { ...testState.admin } })] }
+      })
+
+      expect(wrapper.find('[data-testid="new-service-button"]').exists()).toBe(true)
+    })
   })
 })

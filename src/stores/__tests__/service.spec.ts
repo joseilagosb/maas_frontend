@@ -16,7 +16,7 @@ describe('Service Store', () => {
 
       expect(serviceStore.service).toBeUndefined()
       expect(serviceStore.users).toEqual([])
-      expect(serviceStore.weeks).toEqual([])
+      expect(serviceStore.activeWeeks).toEqual([])
       expect(serviceStore.selectedWeek).toEqual(testTime.week)
       expect(serviceStore.selectedWeekData).toBeUndefined()
     })
@@ -48,14 +48,14 @@ describe('Service Store', () => {
       expect(serviceStore.service!.serviceWorkingDays).toEqual([...serviceWorkingDays])
     })
 
-    it('generates the weeks array', async () => {
-      const weeks = testData.serviceWeeks.map((serviceWeek: any) => serviceWeek.week)
-      expect(serviceStore.weeks).toEqual(weeks)
+    it('generates the activeWeeks array', async () => {
+      const activeWeeks = testData.serviceWeeks.map((serviceWeek: any) => serviceWeek.week)
+      expect(serviceStore.activeWeeks).toEqual(activeWeeks)
     })
   })
 
-  describe('fetchWeekUsersCount', () => {
-    it.todo('fetches the users hour count')
+  describe('fetchUsers', () => {
+    it.todo('fetches the users')
   })
 
   describe('fetchServiceWeek', () => {
