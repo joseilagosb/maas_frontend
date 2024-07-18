@@ -2,6 +2,8 @@ import type { User } from '@/types/models'
 
 const USER_LOCAL_STORAGE_KEY = 'user'
 
+export const API_BASE_URL = import.meta.env['BACKEND_API_URL'] || 'http://localhost:3000'
+
 export const USER_LOCAL_STORAGE_KEYS = {
   USER: USER_LOCAL_STORAGE_KEY,
   TOKEN: 'token'

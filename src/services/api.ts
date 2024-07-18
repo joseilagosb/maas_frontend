@@ -1,10 +1,10 @@
 import axios from 'axios'
 import { JSONDeserializer } from './deserializer'
-import { NULL_OBJECTS, USER_LOCAL_STORAGE_KEYS } from '@/utils/constants'
+import { API_BASE_URL, NULL_OBJECTS, USER_LOCAL_STORAGE_KEYS } from '@/utils/constants'
 
 export const postLogin = async (email: string, password: string) => {
   return axios
-    .post('http://localhost:3000/login', { user: { email, password } })
+    .post(`${API_BASE_URL}/login`, { user: { email, password } })
     .then((response) => {
       if (response && response.data) {
         const { data, headers } = response
@@ -22,7 +22,7 @@ export const postLogin = async (email: string, password: string) => {
 
 export const deleteLogout = async () => {
   return axios
-    .delete('http://localhost:3000/logout')
+    .delete(`${API_BASE_URL}/logout`)
     .then((response) => {
       if (response && response.data) {
         localStorage.removeItem(USER_LOCAL_STORAGE_KEYS.USER)
@@ -37,7 +37,7 @@ export const deleteLogout = async () => {
 
 export const getServices = async () => {
   return axios
-    .get(`http://localhost:3000/services`)
+    .get(`${API_BASE_URL}/services`)
     .then(async (response) => {
       const parsedResponseData = response.data
       const services = await JSONDeserializer.deserialize(parsedResponseData)
@@ -50,7 +50,7 @@ export const getServices = async () => {
 
 export const getUsers = async () => {
   return axios
-    .get(`http://localhost:3000/users`)
+    .get(`${API_BASE_URL}/users`)
     .then(async (response) => {
       const parsedResponseData = response.data
       const users = await JSONDeserializer.deserialize(parsedResponseData)
@@ -63,7 +63,7 @@ export const getUsers = async () => {
 
 export const getService = async (id: number) => {
   return axios
-    .get(`http://localhost:3000/services/${id}`)
+    .get(`${API_BASE_URL}/services/${id}`)
     .then(async (response) => {
       const parsedResponseData = response.data
       const service = await JSONDeserializer.deserialize(parsedResponseData)
@@ -76,7 +76,7 @@ export const getService = async (id: number) => {
 }
 
 export const getServiceWeek = async (id: number, week: number, mode: 'show' | 'edit' = 'show') => {
-  let url = `http://localhost:3000/services/${id}/service_weeks/${week}`
+  let url = `${API_BASE_URL}/services/${id}/service_weeks/${week}`
   if (mode === 'edit') {
     url += '/edit'
   }
