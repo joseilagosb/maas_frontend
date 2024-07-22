@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref, watchEffect } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { storeToRefs } from 'pinia'
 
@@ -33,11 +33,7 @@ const weekOptions = computed(() => {
 const route = useRoute()
 const router = useRouter()
 
-const onChangeWeek = () => {
-  router.replace({ params: { week: selectedWeek.value } })
-}
-
-watchEffect(() => {
+const refreshService = () => {
   serviceStore
     .fetchService(+route.params.id)
     .catch(() => {
@@ -46,6 +42,14 @@ watchEffect(() => {
     .finally(() => {
       loading.value = false
     })
+}
+
+const onChangeWeek = () => {
+  router.replace({ params: { week: selectedWeek.value } })
+}
+
+onMounted(() => {
+  refreshService()
 })
 </script>
 
@@ -53,11 +57,7 @@ watchEffect(() => {
   <div v-if="loading" class="flex flex-col gap-4 items-start justify-start">
     <h1 class="text-2xl font-bold">Cargando...</h1>
   </div>
-  <div
-    v-else-if="service"
-    class="size-full flex flex-col gap-4 items-start justify-start p-2"
-    data-testid="service"
-  >
+  <div v-else-if="service" class="size-full flex flex-col gap-4 items-start justify-start p-2" data-testid="service">
     <div class="w-full flex justify-between items-start pt-8">
       <div class="flex flex-col items-left gap-4">
         <h1 class="text-4xl font-light">
@@ -65,16 +65,15 @@ watchEffect(() => {
           {{ service.name }}
         </h1>
       </div>
-      <div class="flex flex-row gap-2"><slot name="action-buttons"></slot></div>
+      <div class="flex flex-row gap-2">
+        <slot name="action-buttons"></slot>
+      </div>
     </div>
     <div class="size-full flex flex-row gap-4">
       <div class="w-[20%] flex flex-col gap-1">
         <select
           class="px-4 py-2 bg-orange-300 rounded-lg transition duration-500 hover:bg-orange-400 disabled:bg-gray-300 hover:disabled:bg-gray-300"
-          v-model="selectedWeek"
-          @change="onChangeWeek"
-          data-testid="week-select"
-        >
+          v-model="selectedWeek" @change="onChangeWeek" data-testid="week-select">
           <option class="bg-orange-300" v-for="week in weekOptions" :key="week" :value="week">
             {{ `Semana ${week} del ${getYear()}` }}
           </option>
@@ -86,10 +85,8 @@ watchEffect(() => {
           <FontAwesomeIcon :icon="faClock" class="text-md pr-2" />
           <span>Horas asignadas</span>
         </h3>
-        <div
-          class="border border-black rounded-xl py-1 flex flex-col gap-1 overflow-hidden"
-          data-testid="assigned-hours-count"
-        >
+        <div class="border border-black rounded-xl py-1 flex flex-col gap-1 overflow-hidden"
+          data-testid="assigned-hours-count">
           <div class="h-[40px] w-full px-4 bg-green-400 flex items-center justify-between">
             <span class="font-light text-lg">Cristiano Ronaldo</span>
             <span class="font-light text-lg">19</span>
@@ -106,8 +103,7 @@ watchEffect(() => {
         </div>
       </div>
       <div
-        class="w-[80%] grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 auto-rows-max gap-2 overflow-y-auto tiny-scrollbar"
-      >
+        class="w-[80%] grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 auto-rows-max gap-2 overflow-y-auto tiny-scrollbar">
         <slot name="grid"></slot>
       </div>
     </div>

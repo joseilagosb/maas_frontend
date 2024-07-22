@@ -54,9 +54,9 @@ export const useServiceStore = defineStore('service', {
         throw error
       }
     },
-    async fetchServiceWeek(id: number, mode: 'show' | 'edit' = 'show') {
+    async fetchServiceWeek(id: number, week: number, mode: 'show' | 'edit' = 'show') {
       try {
-        const selectedWeekData = await getServiceWeek(id, this.selectedWeek, mode)
+        const selectedWeekData = await getServiceWeek(id, week, mode)
         this.selectedWeekData = selectedWeekData
       } catch (error) {
         throw error

@@ -1,55 +1,79 @@
-import { before, beforeEach, describe } from 'node:test'
-import { beforeAll, expect, it } from 'vitest'
-
+import { expect, it, beforeEach, describe } from 'vitest'
+import { createRouter, createWebHistory } from 'vue-router'
 import { shallowMount } from '@vue/test-utils'
 import { createTestingPinia } from '@pinia/testing'
 
-import { useAuthStore } from '@/stores/auth'
-
 import App from '@/App.vue'
-import { createRouter, createWebHistory } from 'vue-router'
 import { checkIfNotLoggedIn, routes } from '..'
-
-const mockRouter = createRouter({
-  history: createWebHistory(),
-  routes: routes
-})
-mockRouter.beforeEach(checkIfNotLoggedIn)
+import { testData, testState, testTime } from '@/test/data'
 
 describe('router', async () => {
   let pinia: ReturnType<typeof createTestingPinia>
   let wrapper: ReturnType<typeof shallowMount>
-
-  beforeAll(() => {
-    pinia = createTestingPinia({ initialState: { auth: { isLoggedIn: false } } })
-    wrapper = shallowMount(App, { global: { plugins: [pinia, mockRouter] } })
-  })
+  let router: ReturnType<typeof createRouter>
 
   describe('when the user is not logged in', () => {
-    it('redirects to login', () => {
-      mockRouter.push('/').then(() => {
-        expect(wrapper.vm.$route.path).toBe('/login')
+    beforeEach(() => {
+      pinia = createTestingPinia({ initialState: { ...testState.notLoggedIn } })
+      router = createRouter({
+        history: createWebHistory(),
+        routes: routes
       })
+      router.beforeEach(checkIfNotLoggedIn)
+      wrapper = shallowMount(App, { global: { plugins: [pinia, router] } })
+    })
+
+    it('redirects to /login', async () => {
+      router.push('/')
+      await router.isReady()
+      expect(wrapper.vm.$route.path).toBe('/login')
     })
   })
 
-  describe('when the user is logged in', async () => {
-    it('continues to the next route', () => {
-      const authStore = useAuthStore()
-      authStore.$patch({ isLoggedIn: true })
+  describe('when the user is logged in', () => {
+    const service = testData.services[0]
+    const expectedParams = {
+      id: service.id,
+      week: testTime.week
+    }
 
-      mockRouter.push('/').then(() => {
-        expect(wrapper.vm.$route.path).toBe('/')
+    beforeEach(() => {
+      pinia = createTestingPinia({ initialState: { ...testState.user } })
+      router = createRouter({
+        history: createWebHistory(),
+        routes: routes
+      })
+      router.beforeEach(checkIfNotLoggedIn)
+      wrapper = shallowMount(App, { global: { plugins: [pinia, router] } })
+    })
+
+    describe('navigation to /', () => {
+      it('redirects to /services', async () => {
+        router.push('/')
+        await router.isReady()
+        expect(wrapper.vm.$route.path).toBe('/services')
       })
     })
 
-    it('redirects to services when the user is logged in', async () => {
-      await mockRouter.isReady()
-      const authStore = useAuthStore()
-      authStore.$patch({ isLoggedIn: true })
+    describe('navigation to /services/:id', () => {
+      it('redirects to /services/:id/weeks/:week', async () => {
+        router.push(`/services/${service.id}`)
+        await router.isReady()
 
-      mockRouter.push('/').then(() => {
-        expect(wrapper.vm.$route.path).toBe('/services')
+        expect(wrapper.vm.$route.name).toBe('show-service-week')
+        expect(+wrapper.vm.$route.params.id).toEqual(expectedParams.id)
+        expect(+wrapper.vm.$route.params.week).toEqual(expectedParams.week)
+      })
+    })
+
+    describe('navigation to /services/:id/weeks', () => {
+      it('redirects to /services/:id/weeks/:week', async () => {
+        router.push(`/services/${service.id}/weeks`)
+        await router.isReady()
+
+        expect(wrapper.vm.$route.name).toBe('show-service-week')
+        expect(+wrapper.vm.$route.params.id).toEqual(expectedParams.id)
+        expect(+wrapper.vm.$route.params.week).toEqual(expectedParams.week)
       })
     })
   })

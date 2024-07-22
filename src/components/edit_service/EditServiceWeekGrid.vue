@@ -39,7 +39,7 @@ const refreshGrid = () => {
   isErrorVisible.value = false
 
   serviceStore
-    .fetchServiceWeek(+route.params.id, 'edit')
+    .fetchServiceWeek(+route.params.id, selectedWeek.value, 'edit')
     .catch(() => {
       isErrorVisible.value = true
     })
@@ -68,50 +68,29 @@ watch([selectedWeek], () => {
       Volver a intentar
     </button>
   </div>
-  <div
-    v-else
-    v-for="({ day, serviceHours: hours }, dayIndex) in selectedWeekData!.serviceDays"
-    :key="day"
-    class="rounded-lg self-start bg-orange-300 relative overflow-hidden"
-  >
-    <div
-      class="absolute top-0 left-0 w-full h-[40px] bg-orange-500 flex flex-col items-center justify-center"
-    >
+  <div v-else v-for="({ day, serviceHours: hours }, dayIndex) in selectedWeekData!.serviceDays" :key="day"
+    class="rounded-lg self-start bg-orange-300 relative overflow-hidden">
+    <div class="absolute top-0 left-0 w-full h-[40px] bg-orange-500 flex flex-col items-center justify-center">
       <h2 class="text-xl font-bold text-white">
         {{ formatDateInSpanish(addToDate('day', from, day)) }}
       </h2>
     </div>
     <div class="flex flex-row w-full">
       <div class="w-[30%] mt-[40px]"></div>
-      <div
-        class="text-center mt-[40px]"
-        :class="[`${USER_TAILWIND_COLORS[user.color]}`]"
-        :style="[`width: calc(${70 / users.length}%)`]"
-        v-for="user in users"
-      >
+      <div class="text-center mt-[40px]" :class="[`${USER_TAILWIND_COLORS[user.color]}`]"
+        :style="[`width: calc(${70 / users.length}%)`]" v-for="user in users">
         <span class="text-sm font-bold">{{ user.name }}</span>
       </div>
     </div>
     <div v-for="({ hour }, hourIndex) in hours" :key="hour" class="flex flex-row w-full">
       <div class="w-[30%] flex justify-center">
-        <span class="text-sm text-light"
-          >{{ getFormattedHour(hour) }}-{{ getFormattedHour(hour + 1) }}</span
-        >
+        <span class="text-sm text-light">{{ getFormattedHour(hour) }}-{{ getFormattedHour(hour + 1) }}</span>
       </div>
-      <div
-        v-for="(user, userIndex) in users"
-        :key="user.id"
-        class="text-center"
-        :class="[`${USER_TAILWIND_COLORS[user.color]}`]"
-        :style="[`width: calc(${70 / users.length}%)`]"
-      >
-        <input
-          class="rounded size-5"
-          type="checkbox"
+      <div v-for="(user, userIndex) in users" :key="user.id" class="text-center"
+        :class="[`${USER_TAILWIND_COLORS[user.color]}`]" :style="[`width: calc(${70 / users.length}%)`]">
+        <input class="rounded size-5" type="checkbox"
           v-model="currentAvailability!.days[dayIndex].hours[hourIndex].available[userIndex]"
-          @change="serviceAvailabilityStore.changedAvailability = true"
-          :disabled="+user.id !== authStore.user.id"
-        />
+          @change="serviceAvailabilityStore.changedAvailability = true" :disabled="+user.id !== authStore.user.id" />
       </div>
     </div>
   </div>

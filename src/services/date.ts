@@ -2,7 +2,12 @@ import dayjs from 'dayjs'
 import 'dayjs/locale/es'
 import weekOfYear from 'dayjs/plugin/weekOfYear'
 
-export const getWeek = () => dayjs().week()
+export const getWeek = () => {
+  if (!('week' in dayjs())) {
+    applyDatePlugins()
+  }
+  return dayjs().week()
+}
 export const getYear = () => dayjs().year()
 
 export const applyDatePlugins = () => {

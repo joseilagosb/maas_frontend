@@ -30,7 +30,7 @@ const refreshGrid = () => {
   isErrorVisible.value = false
 
   serviceStore
-    .fetchServiceWeek(+route.params.id)
+    .fetchServiceWeek(+route.params.id, selectedWeek.value)
     .catch(() => {
       isErrorVisible.value = true
     })
@@ -58,33 +58,20 @@ watch([selectedWeek], () => {
       Volver a intentar
     </button>
   </div>
-  <div
-    v-else
-    v-for="{ day, serviceHours: hours } in selectedWeekData!.serviceDays"
-    :key="day"
-    class="rounded-lg self-start bg-orange-300 relative overflow-hidden"
-  >
-    <div
-      class="absolute top-0 left-0 w-full h-[40px] bg-orange-500 flex flex-col items-center justify-center"
-    >
+  <div v-else v-for="{ day, serviceHours: hours } in selectedWeekData!.serviceDays" :key="day"
+    class="rounded-lg self-start bg-orange-300 relative overflow-hidden">
+    <div class="absolute top-0 left-0 w-full h-[40px] bg-orange-500 flex flex-col items-center justify-center">
       <h2 class="text-xl font-bold text-white">
         {{ formatDateInSpanish(addToDate('day', from, day)) }}
       </h2>
     </div>
-    <div
-      class="w-full flex flex-row mb-[2px]"
-      :class="[
-        { 'bg-gray-400': !designatedUser },
-        designatedUser && `${USER_TAILWIND_COLORS[designatedUser.color]}`,
-        { 'm-[20px]': index === 0 }
-      ]"
-      v-for="({ hour, designatedUser }, index) in hours"
-      :key="hour"
-    >
+    <div class="w-full flex flex-row mb-[2px]" :class="[
+      { 'bg-gray-400': !designatedUser },
+      designatedUser && `${USER_TAILWIND_COLORS[designatedUser.color]}`,
+      { 'm-[20px]': index === 0 }
+    ]" v-for="({ hour, designatedUser }, index) in hours" :key="hour">
       <div class="w-[40%] flex items-center justify-center">
-        <span class="text-sm text-light"
-          >{{ getFormattedHour(hour) }}-{{ getFormattedHour(hour + 1) }}</span
-        >
+        <span class="text-sm text-light">{{ getFormattedHour(hour) }}-{{ getFormattedHour(hour + 1) }}</span>
       </div>
       <div class="w-[60%] flex items-center justify-center">
         <span class="text-sm font-bold">{{

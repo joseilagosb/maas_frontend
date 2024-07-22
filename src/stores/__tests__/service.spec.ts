@@ -60,11 +60,11 @@ describe('Service Store', () => {
 
   describe('fetchServiceWeek', () => {
     beforeAll(async () => {
-      await serviceStore.fetchServiceWeek(testData.services[0].id)
+      await serviceStore.fetchServiceWeek(testData.services[0].id, testTime.week)
     })
 
     it('fetches to edit route when mode is edit', async () => {
-      await serviceStore.fetchServiceWeek(testData.services[0].id, 'edit')
+      await serviceStore.fetchServiceWeek(testData.services[0].id, testTime.week, 'edit')
       expect(serviceStore.selectedWeekData).toBeDefined()
     })
 
