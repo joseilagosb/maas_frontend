@@ -30,10 +30,10 @@ export const addToSortedArray = (array: number[], value: number) => {
 
   while (min < max) {
     const middle = Math.floor((min + max) / 2)
-    if (value < min) {
-      max = min
-    } else if (value > max) {
-      min = max
+    if (middle < value) {
+      min = middle + 1
+    } else if (middle > value) {
+      max = middle - 1
     } else {
       result.splice(middle, value)
       result.push(value)

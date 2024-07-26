@@ -10,12 +10,34 @@ let originalLocalStorage: Storage
 console.log('[test/setup] Configuración de pruebas iniciada.')
 
 vi.mock('jsonapi-serializer', () => mockJSONAPISerializer)
-vi.mock('@/services/date', () => mockDateService)
+
+// TODO: Refactorizar esto
+vi.mock('@/services/date', async (importOriginal) => {
+  const originalModule = await importOriginal<typeof import('@/services/date')>()
+  return {
+    ...originalModule,
+    getWeek: vi.fn().mockImplementation(mockDateService.getWeek),
+    getYear: vi.fn().mockImplementation(mockDateService.getYear),
+    applyDatePlugins: vi.fn().mockImplementation(mockDateService.applyDatePlugins),
+    addToDate: vi.fn().mockImplementation(mockDateService.addToDate),
+    substractToDate: vi.fn().mockImplementation(mockDateService.substractToDate),
+    formatDateInSpanish: vi.fn().mockImplementation(mockDateService.formatDateInSpanish),
+    firstDayOfWeek: vi.fn().mockImplementation(mockDateService.firstDayOfWeek),
+    lastDayOfWeek: vi.fn().mockImplementation(mockDateService.lastDayOfWeek),
+    nthDayOfWeek: vi.fn().mockImplementation(mockDateService.nthDayOfWeek),
+    formatDate: vi.fn().mockImplementation(mockDateService.formatDate)
+  }
+})
 vi.mock('@/services/api', async (importOriginal) => {
   const originalModule = await importOriginal<typeof import('@/services/api')>()
   return {
     ...originalModule,
-    ...mockAPIService
+    postLogin: vi.fn().mockImplementation(mockAPIService.postLogin),
+    deleteLogout: vi.fn().mockImplementation(mockAPIService.deleteLogout),
+    getWeekUsersCount: vi.fn().mockReturnThis(),
+    getServices: vi.fn().mockImplementation(mockAPIService.getServices),
+    getService: vi.fn().mockImplementation(mockAPIService.getService),
+    getServiceWeek: vi.fn().mockImplementation(mockAPIService.getServiceWeek)
   }
 })
 

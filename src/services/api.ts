@@ -75,7 +75,7 @@ export const getService = async (id: number) => {
     })
 }
 
-export const getServiceWeek = async (id: number, week: number, mode: 'show' | 'edit' = 'show') => {
+export const getServiceWeek = async (id: number, week: number, mode: 'show' | 'edit') => {
   let url = `http://localhost:3000/services/${id}/service_weeks/${week}`
   if (mode === 'edit') {
     url += '/edit'

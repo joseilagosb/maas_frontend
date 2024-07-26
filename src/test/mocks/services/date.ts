@@ -10,5 +10,6 @@ export const mockDateService = {
   formatDateInSpanish: (_: any) => testTime.date.inSpanish,
   firstDayOfWeek: () => testTime.startOfWeek,
   lastDayOfWeek: () => testTime.endOfWeek,
+  nthDayOfWeek: (_: dayjs.Dayjs, day: number) => testTime.startOfWeek,
   formatDate: (_: any, __: any) => '12/07/2024'
 }

@@ -1,26 +1,38 @@
 import type { ComponentPublicInstance } from 'vue'
-import { describe, it, expect, vi, afterAll } from 'vitest'
-import { useRoute } from 'vue-router'
+import { describe, it, expect, vi, afterAll, beforeEach } from 'vitest'
+import { useRoute, useRouter } from 'vue-router'
 import { createTestingPinia } from '@pinia/testing'
 import { flushPromises, shallowMount, VueWrapper } from '@vue/test-utils'
 
 import ServiceOverview from '../ServiceOverview.vue'
 
-import { getService } from '@/services/api'
+import { useServiceStore } from '@/stores/service'
 
-import { testData, testState } from '@/test/data'
+import { getService } from '@/services/api'
+import { formatDate } from '@/services/date'
+
+import { testData, testState, testTime } from '@/test/data'
+
+import { mockAPIService } from '@/test/mocks/services/api'
+import { mockDateService } from '@/test/mocks/services/date'
 
 describe('ServiceOverview', () => {
   vi.mock('vue-router')
+
   const service = testData.services[0]
   const serviceSelector = '[data-testid="service"]'
   const errorMessageSelector = '[data-testid="error-message"]'
 
   vi.mocked(useRoute).mockReturnValue({ params: { id: service.id } } as any)
+  vi.mocked(useRouter).mockReturnValue({ replace: vi.fn() } as any)
+
+  afterAll(() => {
+    vi.restoreAllMocks()
+  })
 
   describe('initial services fetch', () => {
     afterAll(() => {
-      vi.restoreAllMocks()
+      vi.mocked(getService).mockImplementation(mockAPIService.getService)
     })
 
     it('shows the service when the fetch is successful', async () => {
@@ -53,11 +65,17 @@ describe('ServiceOverview', () => {
   })
 
   describe('week selector', () => {
-    const wrapper = shallowMount(ServiceOverview, {
-      global: {
-        plugins: [createTestingPinia({ initialState: { ...testState.user }, stubActions: false })]
-      }
-    }) as VueWrapper<ComponentPublicInstance<typeof ServiceOverview>>
+    let wrapper: VueWrapper<ComponentPublicInstance<typeof ServiceOverview>>
+
+    beforeEach(async () => {
+      wrapper = shallowMount(ServiceOverview, {
+        global: {
+          plugins: [createTestingPinia({ initialState: { ...testState.user }, stubActions: false })]
+        }
+      }) as VueWrapper<ComponentPublicInstance<typeof ServiceOverview>>
+      await flushPromises()
+    })
+
     const weekSelectSelector = '[data-testid="week-select"]'
 
     it('exists', () => {
@@ -66,23 +84,76 @@ describe('ServiceOverview', () => {
 
     it('has the correct weeks', () => {
       const weekOptions = wrapper.find(weekSelectSelector).findAll('option')
-      const weekOptionsFromComponent = wrapper.vm.weekOptions
+      const weekOptionsFromComponentState = wrapper.vm.weekOptions
       expect(weekOptions.map((weekOption) => +weekOption.element.value)).toEqual(
-        weekOptionsFromComponent
+        weekOptionsFromComponentState
       )
     })
 
-    it.todo('does not show a previous week not contained in active weeks')
-    it.todo('shows five weeks in the future')
-    it.todo('changes the route when a week is selected')
-    it.todo('renders the correct text in the options')
+    it('shows five weeks in the future', () => {
+      const weekOptions = wrapper.find(weekSelectSelector).findAll('option').slice(-5)
+      const serviceStore = useServiceStore()
+
+      for (const weekOption of weekOptions) {
+        expect(serviceStore.activeWeeks).not.toContain(+weekOption.element.value)
+      }
+    })
+
+    it('renders the correct text in the options', () => {
+      const weekOptions = wrapper.find(weekSelectSelector).findAll('option')
+      const weekOptionsFromComponentState = wrapper.vm.weekOptions
+
+      for (let i = 0; i < weekOptions.length; i++) {
+        const weekOption = weekOptions[i]
+        expect(weekOption.element.text).toEqual(
+          `Semana ${weekOptionsFromComponentState[i]} del ${testTime.year}`
+        )
+      }
+    })
+
+    it('changes the route when a week is selected', async () => {
+      const weekSelect = wrapper.find(weekSelectSelector)
+      const firstOption = weekSelect.findAll('option')[0]
+      const router = useRouter()
+
+      await weekSelect.setValue(firstOption.element.value)
+
+      expect(router.replace).toHaveBeenCalledWith({ params: { week: +firstOption.element.value } })
+    })
   })
 
   describe('selected week range text', () => {
+    let wrapper: VueWrapper<ComponentPublicInstance<typeof ServiceOverview>>
+
+    beforeEach(async () => {
+      vi.mocked(formatDate)
+        .mockImplementationOnce(() => testTime.date.firstDayOfWeek)
+        .mockImplementationOnce(() => testTime.date.lastDayOfWeek)
+      wrapper = shallowMount(ServiceOverview, {
+        global: {
+          plugins: [createTestingPinia({ initialState: { ...testState.user }, stubActions: false })]
+        }
+      }) as VueWrapper<ComponentPublicInstance<typeof ServiceOverview>>
+      await flushPromises()
+    })
+
+    afterAll(() => {
+      vi.mocked(formatDate).mockImplementation(mockDateService.formatDate)
+    })
+
     const selectedWeekRangeTextSelector = '[data-testid="selected-week-range-text"]'
 
-    it.todo('exists')
-    it.todo('renders with the correct text')
+    it('exists', () => {
+      expect(wrapper.find(selectedWeekRangeTextSelector).exists()).toBe(true)
+    })
+
+    it('renders with the correct text', () => {
+      const selectedWeekRangeText = wrapper.find(selectedWeekRangeTextSelector).text()
+
+      expect(selectedWeekRangeText).toEqual(
+        `del ${testTime.date.firstDayOfWeek} al ${testTime.date.lastDayOfWeek}`
+      )
+    })
   })
 
   describe('assigned hours count', () => {

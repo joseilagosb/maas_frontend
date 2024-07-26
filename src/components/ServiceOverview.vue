@@ -17,7 +17,7 @@ const loading = ref(true)
 const isErrorVisible = ref(false)
 
 const serviceStore = useServiceStore()
-const { service, from, to, selectedWeek, activeWeeks } = storeToRefs(serviceStore)
+const { service, dayOfServiceWeek, selectedWeek, activeWeeks } = storeToRefs(serviceStore)
 
 const weekOptions = computed(() => {
   const currentWeek = getWeek()
@@ -79,7 +79,8 @@ onMounted(() => {
           </option>
         </select>
         <p class="font-light text-sm text-gray-500 pl-5" data-testid="selected-week-range-text">
-          del {{ formatDate(from, 'DD/MM/YYYY') }} al {{ formatDate(to, 'DD/MM/YYYY') }}
+          del {{ formatDate(dayOfServiceWeek('first'), 'DD/MM/YYYY') }} al {{ formatDate(dayOfServiceWeek('last'),
+            'DD/MM/YYYY') }}
         </p>
         <h3 class="text-2xl font-light text-gray-500 pt-4">
           <FontAwesomeIcon :icon="faClock" class="text-md pr-2" />
@@ -102,8 +103,7 @@ onMounted(() => {
           <p class="py-1 font-bold text-center text-sm text-gray-500">3 horas sin asignar</p>
         </div>
       </div>
-      <div
-        class="w-[80%] grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 auto-rows-max gap-2 overflow-y-auto tiny-scrollbar">
+      <div class="w-[80%] overflow-y-auto tiny-scrollbar">
         <slot name="grid"></slot>
       </div>
     </div>
