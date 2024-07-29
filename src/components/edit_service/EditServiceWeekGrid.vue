@@ -7,9 +7,9 @@ import { useServiceStore } from '@/stores/service'
 import { useAuthStore } from '@/stores/auth'
 import { useServiceAvailabilityStore } from '@/stores/service_availability'
 
-import { getFormattedHour } from '@/utils/common'
+import { addToDate, formatDateInSpanish, getFormattedHour } from '@/services/date'
+
 import { USER_TAILWIND_COLORS } from '@/utils/constants'
-import { addToDate, formatDateInSpanish } from '@/services/date'
 
 const loading = ref(true)
 const isErrorVisible = ref(false)

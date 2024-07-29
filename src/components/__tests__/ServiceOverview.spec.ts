@@ -13,7 +13,6 @@ import { formatDate } from '@/services/date'
 
 import { testData, testState, testTime } from '@/test/data'
 
-import { mockAPIService } from '@/test/mocks/services/api'
 import { mockDateService } from '@/test/mocks/services/date'
 
 describe('ServiceOverview', () => {
@@ -31,10 +30,6 @@ describe('ServiceOverview', () => {
   })
 
   describe('initial services fetch', () => {
-    afterAll(() => {
-      vi.mocked(getService).mockImplementation(mockAPIService.getService)
-    })
-
     it('shows the service when the fetch is successful', async () => {
       const wrapper = shallowMount(ServiceOverview, {
         global: {
@@ -48,7 +43,7 @@ describe('ServiceOverview', () => {
     })
 
     it('shows an error message when the fetch fails', async () => {
-      vi.mocked(getService).mockImplementation(async () => {
+      vi.mocked(getService).mockImplementationOnce(async () => {
         return Promise.reject(new Error('error'))
       })
 

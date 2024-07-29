@@ -2,6 +2,17 @@ import dayjs from 'dayjs'
 import 'dayjs/locale/es'
 import weekOfYear from 'dayjs/plugin/weekOfYear'
 
+export const getFormattedHour = (hour: number): string => {
+  if (hour < 10) {
+    return `0${hour}:00`
+  }
+  if (hour === 24) {
+    return '00:00'
+  }
+
+  return `${hour}:00`
+}
+
 export const getWeek = () => {
   if (!('week' in dayjs())) {
     applyDatePlugins()

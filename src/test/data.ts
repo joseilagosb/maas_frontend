@@ -2,7 +2,15 @@ import { getArrayFromInterval } from '@/utils/common'
 
 export const testTime = {
   date: {
-    inSpanish: '6 de marzo de 2024',
+    inSpanish: [
+      '6 de marzo de 2024',
+      '7 de marzo de 2024',
+      '8 de marzo de 2024',
+      '9 de marzo de 2024',
+      '10 de marzo de 2024',
+      '11 de marzo de 2024',
+      '12 de marzo de 2024'
+    ],
     firstDayOfWeek: '04/03/2024',
     lastDayOfWeek: '10/03/2024'
   },
@@ -22,13 +30,15 @@ export const testData = {
     type: 'user',
     name: 'Messi',
     email: 'messi@maas.com',
-    role: 'user'
+    role: 'user',
+    color: 'blue'
   } as const,
   admin: {
     id: 2,
     name: 'Pepe',
     email: 'pepe@maas.com',
-    role: 'admin'
+    role: 'admin',
+    color: 'red'
   } as const,
   services: [
     { id: 1, type: 'service', name: 'service1', active: true },

@@ -16,6 +16,7 @@ vi.mock('@/services/date', async (importOriginal) => {
   const originalModule = await importOriginal<typeof import('@/services/date')>()
   return {
     ...originalModule,
+    getFormattedHour: vi.fn().mockImplementation(mockDateService.getFormattedHour),
     getWeek: vi.fn().mockImplementation(mockDateService.getWeek),
     getYear: vi.fn().mockImplementation(mockDateService.getYear),
     applyDatePlugins: vi.fn().mockImplementation(mockDateService.applyDatePlugins),
