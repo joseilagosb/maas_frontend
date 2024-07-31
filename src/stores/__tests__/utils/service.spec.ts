@@ -1,49 +1,83 @@
 import { describe, expect, it } from 'vitest'
 
 import { getEmptyServiceWeekData } from '@/stores/utils/service'
-import { getArrayFromInterval } from '@/utils/common'
 
-import type { ServiceWorkingDay } from '@/types/models'
-import { testTime } from '@/test/data'
+import { testState, testTime } from '@/test/data'
+import type { ServiceHour, ServiceWeek } from '@/types/models'
+
+const forEveryServiceWeekHour = (
+  result: ServiceWeek,
+  expected: ServiceWeek,
+  action: (result: ServiceHour, expected: ServiceHour) => void
+) => {
+  expected.serviceDays.forEach((expectedServiceDay, dayIndex) => {
+    expectedServiceDay.serviceHours.forEach((expectedServiceHour, hourIndex) => {
+      const resultServiceHour = result.serviceDays[dayIndex].serviceHours[hourIndex]
+      action(resultServiceHour, expectedServiceHour)
+    })
+  })
+}
 
 describe('Service Utils', () => {
   describe('getEmptyServiceWeekData', () => {
-    const serviceWorkingDays: ServiceWorkingDay[] = [{ id: 1, day: 1, from: 10, to: 22 }]
-    const emptyServiceWeekData = getEmptyServiceWeekData(serviceWorkingDays, testTime.week)
+    const { serviceWorkingDays } = testState.showServiceStore.service
 
-    it('contains the correct week', () => {
-      expect(emptyServiceWeekData.week).toEqual(testTime.week)
-    })
-
-    it('contains the correct service days', () => {
-      const serviceDays = emptyServiceWeekData.serviceDays
-      expect(serviceDays.length).toEqual(serviceWorkingDays.length)
-      serviceDays.forEach((serviceDay, dayIndex) => {
-        expect(serviceDay.day).toEqual(serviceWorkingDays[dayIndex].day)
+    describe('parameters', () => {
+      it('throws an error if an empty service working days is passed', () => {
+        expect(() => getEmptyServiceWeekData([], testTime.week)).toThrow()
       })
     })
 
-    describe('service hours', () => {
-      const serviceDays = emptyServiceWeekData.serviceDays
-      const hoursArray = getArrayFromInterval(serviceWorkingDays[0].from, serviceWorkingDays[0].to)
+    const resultServiceWeekData = getEmptyServiceWeekData(serviceWorkingDays, testTime.week)
+    const expectedServiceWeekData = testState.emptyServiceWeekData
 
-      it('contains the correct service hours', () => {
-        serviceDays.forEach((serviceDay) => {
-          const serviceHours = serviceDay.serviceHours
-          expect(serviceHours.length).toEqual(hoursArray.length)
-          serviceHours.forEach((serviceHour, hourIndex) => {
-            expect(serviceHour.hour).toEqual(hoursArray[hourIndex])
-          })
+    const { serviceDays: resultServiceDays } = resultServiceWeekData
+
+    describe('week', () => {
+      it('contains the correct week', () => {
+        expect(resultServiceWeekData.week).toEqual(testTime.week)
+      })
+
+      it('has the correct amount of days', () => {
+        expect(resultServiceDays.length).toEqual(serviceWorkingDays.length)
+        expect(resultServiceDays.length).toEqual(expectedServiceWeekData.serviceDays.length)
+      })
+    })
+
+    describe('day', () => {
+      it('contains the correct day', () => {
+        resultServiceDays.forEach((resultServiceDay, dayIndex) => {
+          expect(resultServiceDay.day).toEqual(expectedServiceWeekData.serviceDays[dayIndex].day)
         })
+      })
+
+      it('has the correct amount of hours', () => {
+        resultServiceDays.forEach((resultServiceDay, dayIndex) => {
+          expect(resultServiceDay.serviceHours.length).toEqual(
+            expectedServiceWeekData.serviceDays[dayIndex].serviceHours.length
+          )
+        })
+      })
+    })
+
+    describe('hour', () => {
+      it('contains the correct data', () => {
+        forEveryServiceWeekHour(
+          resultServiceWeekData,
+          expectedServiceWeekData,
+          (result, expected) => expect(result.hour).toEqual(expected.hour)
+        )
       })
 
       it('does not designate a user', () => {
-        serviceDays.forEach((serviceDay) => {
-          const serviceHours = serviceDay.serviceHours
-          serviceHours.forEach((serviceHour) => {
-            expect(serviceHour.designatedUser).toBeUndefined()
-          })
-        })
+        forEveryServiceWeekHour(
+          resultServiceWeekData,
+          expectedServiceWeekData,
+          (result, expected) => {
+            expect(result.designatedUser).toEqual(expected.designatedUser)
+            expect(result.designatedUser).toBeUndefined()
+          }
+        )
       })
     })
   })

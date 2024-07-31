@@ -62,6 +62,9 @@ export const useServiceStore = defineStore('service', {
     async fetchUsers() {
       try {
         const users = await getUsers()
+        if (!users) {
+          throw new Error('No users were found')
+        }
         this.users = users
       } catch (error) {
         throw error
@@ -77,12 +80,16 @@ export const useServiceStore = defineStore('service', {
     },
     generateEmptyServiceWeek() {
       const serviceWorkingDays = this.service!.serviceWorkingDays
-      const serviceWeekData: ServiceWeek = getEmptyServiceWeekData(
-        serviceWorkingDays,
-        this.selectedWeek
-      )
+      try {
+        const serviceWeekData: ServiceWeek = getEmptyServiceWeekData(
+          serviceWorkingDays,
+          this.selectedWeek
+        )
 
-      this.selectedWeekData = serviceWeekData
+        this.selectedWeekData = serviceWeekData
+      } catch (error) {
+        throw error
+      }
     }
   }
 })

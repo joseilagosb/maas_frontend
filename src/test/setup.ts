@@ -38,7 +38,8 @@ vi.mock('@/services/api', async (importOriginal) => {
     getWeekUsersCount: vi.fn().mockReturnThis(),
     getServices: vi.fn().mockImplementation(mockAPIService.getServices),
     getService: vi.fn().mockImplementation(mockAPIService.getService),
-    getServiceWeek: vi.fn().mockImplementation(mockAPIService.getServiceWeek)
+    getServiceWeek: vi.fn().mockImplementation(mockAPIService.getServiceWeek),
+    getUsers: vi.fn().mockImplementation(mockAPIService.getUsers)
   }
 })
 

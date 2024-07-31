@@ -18,11 +18,10 @@ import { mockDateService } from '@/test/mocks/services/date'
 describe('ServiceOverview', () => {
   vi.mock('vue-router')
 
-  const service = testData.services[0]
   const serviceSelector = '[data-testid="service"]'
   const errorMessageSelector = '[data-testid="error-message"]'
 
-  vi.mocked(useRoute).mockReturnValue({ params: { id: service.id } } as any)
+  vi.mocked(useRoute).mockReturnValue({ params: { id: testData.service.id } } as any)
   vi.mocked(useRouter).mockReturnValue({ replace: vi.fn() } as any)
 
   afterAll(() => {

@@ -15,5 +15,6 @@ export const mockAPIService = {
       default:
         return Promise.resolve(testResponses.showServiceWeek)
     }
-  }
+  },
+  getUsers: () => Promise.resolve(testData.users)
 }

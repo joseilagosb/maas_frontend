@@ -31,9 +31,8 @@ describe('router', async () => {
   })
 
   describe('when the user is logged in', () => {
-    const service = testData.services[0]
     const expectedParams = {
-      id: service.id,
+      id: testData.service.id,
       week: testTime.week
     }
 
@@ -57,7 +56,7 @@ describe('router', async () => {
 
     describe('navigation to /services/:id', () => {
       it('redirects to /services/:id/weeks/:week', async () => {
-        router.push(`/services/${service.id}`)
+        router.push(`/services/${testData.service.id}`)
         await router.isReady()
 
         expect(wrapper.vm.$route.name).toBe('show-service-week')
@@ -68,7 +67,7 @@ describe('router', async () => {
 
     describe('navigation to /services/:id/weeks', () => {
       it('redirects to /services/:id/weeks/:week', async () => {
-        router.push(`/services/${service.id}/weeks`)
+        router.push(`/services/${testData.service.id}/weeks`)
         await router.isReady()
 
         expect(wrapper.vm.$route.name).toBe('show-service-week')

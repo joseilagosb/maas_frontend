@@ -1,4 +1,4 @@
-import type { CurrentAvailability, Service, ServiceWeek, User } from './models'
+import type { Availability, Service, ServiceWeek, User } from './models'
 
 export type AuthState = {
   isLoggedIn: boolean
@@ -18,6 +18,6 @@ export type ServiceState = {
 }
 
 export type ServiceAvailabilityState = {
-  currentAvailability?: CurrentAvailability
+  availabilityData?: Availability
   changedAvailability: boolean
 }

@@ -11,7 +11,6 @@ import { testData, testState, testTime } from '@/test/data'
 describe('ShowServiceActionButtons', () => {
   vi.mock('vue-router')
 
-  const service = testData.services[0]
   const editServiceWeekButtonSelector = '[data-testid="edit-service-week-button"]'
 
   afterAll(() => {
@@ -20,7 +19,7 @@ describe('ShowServiceActionButtons', () => {
 
   describe('edit my availability button', () => {
     vi.mocked(useRoute).mockReturnValue({
-      params: { id: service.id, week: testTime.week }
+      params: { id: testData.service.id, week: testTime.week }
     } as any)
 
     const wrapper = shallowMount(ShowServiceActionButtons, {
@@ -36,24 +35,24 @@ describe('ShowServiceActionButtons', () => {
       }
     })
 
+    const editServiceWeekButton = wrapper.findComponent(
+      editServiceWeekButtonSelector
+    ) as VueWrapper<ComponentPublicInstance<RouterLinkProps>>
+
     it('exists', () => {
-      expect(wrapper.find(editServiceWeekButtonSelector).exists()).toBe(true)
+      expect(editServiceWeekButton.exists()).toBe(true)
     })
 
     it('renders with the correct title', () => {
-      const editServiceWeekButtonTitle = wrapper.find(editServiceWeekButtonSelector).find('span')
+      const editServiceWeekButtonTitle = editServiceWeekButton.find('span')
 
       expect(editServiceWeekButtonTitle.text()).toEqual('Editar mi disponibilidad')
     })
 
     it('links to the correct route', () => {
-      const editServiceWeekButton = wrapper.findComponent(
-        editServiceWeekButtonSelector
-      ) as VueWrapper<ComponentPublicInstance<RouterLinkProps>>
-
       const expectedRoute = {
         name: 'edit-service-week',
-        params: { id: service.id, week: testTime.week }
+        params: { id: testData.service.id, week: testTime.week }
       }
 
       expect(editServiceWeekButton.props('to')).toEqual(expectedRoute)

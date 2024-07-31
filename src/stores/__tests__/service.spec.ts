@@ -1,13 +1,12 @@
 import { createPinia } from 'pinia'
 import { useRoute } from 'vue-router'
-import { it, expect, describe, vi, beforeAll, afterEach } from 'vitest'
+import { it, expect, describe, vi, beforeAll, afterEach, beforeEach } from 'vitest'
 
 import { useServiceStore } from '../service'
 import { testData, testState, testTime } from '@/test/data'
 import { getServiceWeek } from '@/services/api'
 
 describe('Service Store', () => {
-  const service = testData.services[0]
   let serviceStore: ReturnType<typeof useServiceStore>
   vi.mock('vue-router')
 
@@ -42,7 +41,7 @@ describe('Service Store', () => {
     serviceStore = useServiceStore(createPinia())
 
     beforeAll(async () => {
-      await serviceStore.fetchService(service.id)
+      await serviceStore.fetchService(testData.service.id)
     })
 
     it('fetches the service', () => {
@@ -63,11 +62,11 @@ describe('Service Store', () => {
   describe('fetchServiceWeek', () => {
     describe('show mode', () => {
       beforeAll(async () => {
-        await serviceStore.fetchServiceWeek(service.id, testTime.week, 'show')
+        await serviceStore.fetchServiceWeek(testData.service.id, testTime.week, 'show')
       })
 
       it('fetches to api show route', async () => {
-        expect(getServiceWeek).toHaveBeenCalledWith(service.id, testTime.week, 'show')
+        expect(getServiceWeek).toHaveBeenCalledWith(testData.service.id, testTime.week, 'show')
       })
 
       it('fetches the service week', () => {
@@ -78,18 +77,17 @@ describe('Service Store', () => {
     })
 
     describe('edit mode', () => {
-      beforeAll(async () => {
-        await serviceStore.fetchServiceWeek(testData.services[0].id, testTime.week, 'edit')
+      beforeEach(async () => {
+        await serviceStore.fetchServiceWeek(testData.service.id, testTime.week, 'edit')
       })
 
       it('fetches to api edit route', async () => {
-        expect(getServiceWeek).toHaveBeenCalledWith(testData.services[0].id, testTime.week, 'edit')
+        expect(getServiceWeek).toHaveBeenCalledWith(testData.service.id, testTime.week, 'edit')
       })
 
-      it('fetches the service week', () => {
-        const { selectedWeekData } = testState.editServiceStore
+      it('fetches the service week', async () => {
         expect(serviceStore.selectedWeekData).toBeDefined()
-        expect(serviceStore.selectedWeekData).toEqual(selectedWeekData)
+        expect(serviceStore.selectedWeekData).toEqual(testState.editServiceStore.selectedWeekData)
       })
     })
   })

@@ -1,26 +1,33 @@
-import type {
-  CurrentAvailability,
-  ServiceDay,
-  ServiceHour,
-  ServiceWeek,
-  User
-} from '@/types/models'
+import type { Availability, ServiceDay, ServiceHour, ServiceWeek, User } from '@/types/models'
 
-export const getCurrentAvailability = (
+export const getAvailabilityData = (
   selectedWeek: number,
   selectedWeekData: ServiceWeek,
   users: User[]
-) => {
-  const currentAvailability: CurrentAvailability = {
+): Availability => {
+  if (users.length === 0) {
+    throw new Error('No users were passed, the availability cannot be calculated')
+  }
+
+  if (selectedWeekData.serviceDays.length === 0) {
+    throw new Error('No service days found, the availability cannot be calculated')
+  }
+
+  return {
     week: selectedWeek,
-    days: selectedWeekData.serviceDays.map((serviceDay: ServiceDay) => {
+    serviceDays: selectedWeekData.serviceDays.map((serviceDay: ServiceDay) => {
+      if (serviceDay.serviceHours.length === 0) {
+        throw new Error('Service day has no service hours, the availability cannot be calculated')
+      }
       const serviceDayHours = serviceDay.serviceHours.map((serviceHour: ServiceHour) => {
-        const availableArr = users.map((user: User) => {
-          if (serviceHour.users?.some((availableUser: User) => availableUser.id === user.id)) {
-            return true
-          }
-          return false
-        })
+        let availableArr
+        if (serviceHour.users) {
+          availableArr = users.map((user: User) =>
+            serviceHour.users!.some((availableUser: User) => availableUser.id === user.id)
+          )
+        } else {
+          availableArr = Array(users.length).fill(false)
+        }
 
         return {
           hour: serviceHour.hour,
@@ -30,35 +37,8 @@ export const getCurrentAvailability = (
 
       return {
         day: serviceDay.day,
-        hours: serviceDayHours
+        serviceHours: serviceDayHours
       }
     })
   }
-
-  return currentAvailability
-}
-
-export const getEmptyCurrentAvailability = (
-  selectedWeek: number,
-  selectedWeekData: ServiceWeek,
-  users: User[]
-) => {
-  const currentAvailability: CurrentAvailability = {
-    week: selectedWeek,
-    days: selectedWeekData.serviceDays.map((serviceDay: ServiceDay) => {
-      const serviceDayHours = serviceDay.serviceHours.map((serviceHour: ServiceHour) => {
-        const availableArr = Array(users.length).fill(false)
-        return {
-          hour: serviceHour.hour,
-          available: availableArr
-        }
-      })
-      return {
-        day: serviceDay.day,
-        hours: serviceDayHours
-      }
-    })
-  }
-
-  return currentAvailability
 }

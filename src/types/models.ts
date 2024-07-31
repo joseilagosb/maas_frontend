@@ -41,15 +41,15 @@ export type ServiceHour = {
   users?: User[]
 }
 
-export type CurrentAvailability = {
+export type Availability = {
   week: number
-  days: CurrentAvailabilityDay[]
+  serviceDays: AvailabilityDay[]
 }
-export type CurrentAvailabilityDay = {
+export type AvailabilityDay = {
   day: number
-  hours: CurrentAvailabilityHour[]
+  serviceHours: AvailabilityHour[]
 }
-export type CurrentAvailabilityHour = {
+export type AvailabilityHour = {
   hour: number
   available: boolean[]
 }

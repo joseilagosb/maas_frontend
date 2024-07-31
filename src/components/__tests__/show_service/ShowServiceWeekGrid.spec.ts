@@ -13,19 +13,10 @@ import { addToDate, formatDateInSpanish, getFormattedHour } from '@/services/dat
 
 import { testData, testState, testTime } from '@/test/data'
 import { mockAPIService } from '@/test/mocks/services/api'
+import { prepareFormatDateMethods, shallowMountWithPinia } from '@/test/utils'
+import { mockDateService } from '@/test/mocks/services/date'
+
 import { USER_TAILWIND_COLORS } from '@/utils/constants'
-
-export const prepareFormatDateMethods = () => {
-  const mockFormatDateInSpanish = vi.mocked(formatDateInSpanish)
-  const mockAddToDate = vi.mocked(addToDate)
-
-  mockAddToDate.mockClear()
-  mockFormatDateInSpanish.mockClear()
-
-  for (let dateInSpanish of testTime.date.inSpanish) {
-    mockFormatDateInSpanish.mockReturnValueOnce(dateInSpanish)
-  }
-}
 
 describe('ShowServiceWeekGrid', () => {
   vi.mock('vue-router')
@@ -39,99 +30,100 @@ describe('ShowServiceWeekGrid', () => {
   const errorMessageSelector = '[data-testid="error-message"]'
 
   describe('mounted', () => {
-    it('fetches when it contains active weeks', async () => {
-      const serviceStoreWithWeekData = testState.serviceStore
-      shallowMount(ShowServiceWeekGrid, {
-        global: {
-          plugins: [
-            createTestingPinia({
-              initialState: { ...testState.user, service: serviceStoreWithWeekData },
-              stubActions: false
-            })
-          ]
-        }
-      }) as VueWrapper<ComponentPublicInstance<typeof ShowServiceWeekGrid>>
-
-      await flushPromises()
-
-      const serviceStore = useServiceStore()
-      expect(serviceStore.generateEmptyServiceWeek).toHaveBeenCalledTimes(0)
-      expect(serviceStore.fetchServiceWeek).toHaveBeenCalledTimes(1)
-    })
-
-    it('does not fetch when it does not contain active weeks', async () => {
+    describe('active weeks does not contain selected week', () => {
+      const serviceWeeksWithoutCurrentWeek = [...testData.serviceWeeks]
+      serviceWeeksWithoutCurrentWeek[0].week = testTime.week - 1
       const serviceStoreWithoutWeekData = {
         ...testState.serviceStore,
-        activeWeeks: testData.serviceWeeksWithoutCurrentWeek.map(
-          (serviceWeek: any) => serviceWeek.week
-        )
+        activeWeeks: serviceWeeksWithoutCurrentWeek.map((serviceWeek: any) => serviceWeek.week)
       }
 
-      shallowMount(ShowServiceWeekGrid, {
-        global: {
-          plugins: [
-            createTestingPinia({
-              initialState: { ...testState.user, service: { ...serviceStoreWithoutWeekData } },
-              stubActions: false
-            })
-          ]
-        }
-      }) as VueWrapper<ComponentPublicInstance<typeof ShowServiceWeekGrid>>
+      let wrapper: VueWrapper<ComponentPublicInstance<typeof ShowServiceWeekGrid>>
 
-      await flushPromises()
+      beforeEach(async () => {
+        wrapper = shallowMount(ShowServiceWeekGrid, {
+          global: {
+            plugins: [
+              createTestingPinia({
+                initialState: { ...testState.user, service: { ...serviceStoreWithoutWeekData } },
+                stubActions: false
+              })
+            ]
+          }
+        }) as VueWrapper<ComponentPublicInstance<typeof ShowServiceWeekGrid>>
+        await flushPromises()
+      })
 
-      const serviceStore = useServiceStore()
-      expect(serviceStore.generateEmptyServiceWeek).toHaveBeenCalledTimes(1)
-      expect(serviceStore.fetchServiceWeek).toHaveBeenCalledTimes(0)
+      it('runs the generateEmptyServiceWeek action', () => {
+        const serviceStore = useServiceStore()
+        expect(serviceStore.generateEmptyServiceWeek).toHaveBeenCalledTimes(1)
+      })
+
+      it('renders the grid', async () => {
+        expect(wrapper.find(gridSelector).exists()).toBe(true)
+      })
+    })
+
+    describe('service week fetch', () => {
+      let wrapper: VueWrapper<ComponentPublicInstance<typeof ShowServiceWeekGrid>>
+
+      it('runs the fetchServiceWeek action', async () => {
+        shallowMountWithPinia(ShowServiceWeekGrid, {
+          initialState: { ...testState.user, service: { ...testState.serviceStore } },
+          stubActions: false
+        })
+        await flushPromises()
+
+        const serviceStore = useServiceStore()
+        expect(serviceStore.fetchServiceWeek).toHaveBeenCalledTimes(1)
+      })
+
+      describe('success', () => {
+        beforeEach(async () => {
+          wrapper = shallowMountWithPinia(ShowServiceWeekGrid, {
+            initialState: { ...testState.user, service: { ...testState.serviceStore } },
+            stubActions: false
+          })
+          await flushPromises()
+        })
+
+        it('renders the grid', async () => {
+          expect(wrapper.find(gridSelector).exists()).toBe(true)
+        })
+      })
+
+      describe('failed', () => {
+        afterAll(() => {
+          vi.mocked(getServiceWeek).mockImplementation(mockAPIService.getServiceWeek)
+        })
+
+        beforeEach(async () => {
+          vi.mocked(getServiceWeek).mockImplementationOnce(async () => {
+            return Promise.reject(new Error('error'))
+          })
+          wrapper = shallowMountWithPinia(ShowServiceWeekGrid, {
+            initialState: { ...testState.user, service: { ...testState.serviceStore } },
+            stubActions: false
+          })
+          await flushPromises()
+        })
+
+        it('renders error', async () => {
+          expect(wrapper.find(errorMessageSelector).exists()).toBe(true)
+        })
+      })
     })
   })
 
-  describe('initial service week fetch', () => {
-    afterAll(() => {
-      vi.mocked(getServiceWeek).mockImplementation(mockAPIService.getServiceWeek)
-    })
-
-    it('shows the service week when the fetch is successful', async () => {
-      const wrapper = shallowMount(ShowServiceWeekGrid, {
-        global: {
-          plugins: [
-            createTestingPinia({
-              initialState: { ...testState.user, service: { ...testState.serviceStore } },
-              stubActions: false
-            })
-          ]
-        }
-      })
-      await flushPromises()
-
-      expect(wrapper.find(gridSelector).exists()).toBe(true)
-    })
-
-    it('shows an error message when the fetch fails', async () => {
-      vi.mocked(getServiceWeek).mockImplementation(async () => {
-        return Promise.reject(new Error('error'))
-      })
-      const wrapper = shallowMount(ShowServiceWeekGrid, {
-        global: {
-          plugins: [
-            createTestingPinia({
-              initialState: { ...testState.user, service: { ...testState.showServiceStore } },
-              stubActions: false
-            })
-          ]
-        }
-      })
-      await flushPromises()
-
-      expect(wrapper.find(errorMessageSelector).exists()).toBe(true)
-    })
-  })
-
-  describe('service week with designated users', () => {
-    describe('grid days', () => {
+  describe('grid', () => {
+    describe('days', () => {
       let wrapper: VueWrapper<ComponentPublicInstance<typeof ShowServiceWeekGrid>>
 
       const gridDaysSelector = '[data-testid="grid-day"]'
+
+      afterAll(() => {
+        vi.mocked(getFormattedHour).mockImplementation(mockDateService.getFormattedHour)
+      })
 
       beforeEach(async () => {
         prepareFormatDateMethods()
@@ -166,7 +158,7 @@ describe('ShowServiceWeekGrid', () => {
       })
     })
 
-    describe('grid hours', () => {
+    describe('hours', () => {
       let wrapper: VueWrapper<ComponentPublicInstance<typeof ShowServiceWeekGrid>>
 
       const gridHoursSelector = '[data-testid="grid-hour"]'
