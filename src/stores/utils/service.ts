@@ -2,10 +2,17 @@ import type { ServiceDay, ServiceHour, ServiceWeek, ServiceWorkingDay } from '@/
 
 import { getArrayFromInterval } from '@/utils/common'
 
-export const getEmptyServiceWeekData = (serviceWorkingDays: ServiceWorkingDay[]) => {
-  const serviceWeekData: ServiceWeek = {
+export const getEmptyServiceWeekData = (
+  serviceWorkingDays: ServiceWorkingDay[],
+  week: number
+): ServiceWeek => {
+  if (serviceWorkingDays.length === 0) {
+    throw new Error('ServiceWorkingDays must not be empty, the service week cannot be generated')
+  }
+
+  return {
     id: 0,
-    week: 0,
+    week,
     serviceDays: serviceWorkingDays.map((serviceWorkingDay: ServiceWorkingDay) => {
       const hoursArray = getArrayFromInterval(serviceWorkingDay.from, serviceWorkingDay.to)
       const serviceDay: ServiceDay = {
@@ -24,6 +31,4 @@ export const getEmptyServiceWeekData = (serviceWorkingDays: ServiceWorkingDay[])
       return serviceDay
     })
   }
-
-  return serviceWeekData
 }

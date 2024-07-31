@@ -7,7 +7,7 @@ export const mockJSONAPISerializer = {
       deserialize: vi.fn().mockImplementation((data) => {
         if (data.type === 'service') {
           return {
-            ...testData.services[0],
+            ...testData.service,
             serviceWorkingDays: [...testData.serviceWorkingDays],
             serviceWeeks: [...testData.serviceWeeks]
           }

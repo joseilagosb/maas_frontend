@@ -27,7 +27,7 @@ describe('ServicesIndex', () => {
     await flushPromises()
 
     expect(wrapper.find(servicesSelector).exists()).toBe(true)
-    expect(wrapper.findAll(serviceSelector).length).toBe(2)
+    expect(wrapper.findAll(serviceSelector).length).toBe(testData.services.length)
   })
 
   it('shows an error message when the fetch fails', async () => {

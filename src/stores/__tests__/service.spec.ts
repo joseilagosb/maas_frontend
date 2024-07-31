@@ -1,15 +1,21 @@
 import { createPinia } from 'pinia'
 import { useRoute } from 'vue-router'
-import { it, expect, describe, vi, beforeAll } from 'vitest'
+import { it, expect, describe, vi, beforeAll, afterEach, beforeEach } from 'vitest'
 
 import { useServiceStore } from '../service'
-import { testData, testTime } from '@/test/data'
+import { testData, testState, testTime } from '@/test/data'
+import { getServiceWeek } from '@/services/api'
 
 describe('Service Store', () => {
   let serviceStore: ReturnType<typeof useServiceStore>
   vi.mock('vue-router')
 
   describe('initialize', () => {
+    afterEach(() => {
+      vi.mocked(useRoute).mockReturnValue({ params: { week: testTime.week } } as any)
+      serviceStore = useServiceStore(createPinia())
+    })
+
     it('initializes the store', () => {
       vi.mocked(useRoute).mockReturnValue({ params: { week: undefined } } as any)
       serviceStore = useServiceStore(createPinia())
@@ -33,24 +39,19 @@ describe('Service Store', () => {
   describe('fetchService', () => {
     vi.mocked(useRoute).mockReturnValue({ params: { week: testTime.week } } as any)
     serviceStore = useServiceStore(createPinia())
-    const service = testData.services[0]
-    const serviceWorkingDays = testData.serviceWorkingDays
 
     beforeAll(async () => {
-      await serviceStore.fetchService(service.id)
+      await serviceStore.fetchService(testData.service.id)
     })
 
-    it('fetches a service', async () => {
+    it('fetches the service', () => {
       expect(serviceStore.service).toBeDefined()
-      expect(serviceStore.service!.id).toEqual(service.id)
-      expect(serviceStore.service!.name).toEqual(service.name)
-      expect(serviceStore.service!.active).toEqual(service.active)
-      expect(serviceStore.service!.serviceWorkingDays).toEqual([...serviceWorkingDays])
+      expect(serviceStore.service).toEqual(testState.serviceStore.service)
     })
 
-    it('generates the activeWeeks array', async () => {
-      const activeWeeks = testData.serviceWeeks.map((serviceWeek: any) => serviceWeek.week)
-      expect(serviceStore.activeWeeks).toEqual(activeWeeks)
+    it('generates the activeWeeks array', () => {
+      expect(serviceStore.activeWeeks).toBeDefined()
+      expect(serviceStore.activeWeeks).toEqual(testState.serviceStore.activeWeeks)
     })
   })
 
@@ -59,19 +60,44 @@ describe('Service Store', () => {
   })
 
   describe('fetchServiceWeek', () => {
-    beforeAll(async () => {
-      await serviceStore.fetchServiceWeek(testData.services[0].id)
+    describe('show mode', () => {
+      beforeAll(async () => {
+        await serviceStore.fetchServiceWeek(testData.service.id, testTime.week, 'show')
+      })
+
+      it('fetches to api show route', async () => {
+        expect(getServiceWeek).toHaveBeenCalledWith(testData.service.id, testTime.week, 'show')
+      })
+
+      it('fetches the service week', () => {
+        const { selectedWeekData } = testState.showServiceStore
+        expect(serviceStore.selectedWeekData).toBeDefined()
+        expect(serviceStore.selectedWeekData).toEqual(selectedWeekData)
+      })
     })
 
-    it('fetches to edit route when mode is edit', async () => {
-      await serviceStore.fetchServiceWeek(testData.services[0].id, 'edit')
-      expect(serviceStore.selectedWeekData).toBeDefined()
-    })
+    describe('edit mode', () => {
+      beforeEach(async () => {
+        await serviceStore.fetchServiceWeek(testData.service.id, testTime.week, 'edit')
+      })
 
-    it.todo('fetches the service week', () => {})
+      it('fetches to api edit route', async () => {
+        expect(getServiceWeek).toHaveBeenCalledWith(testData.service.id, testTime.week, 'edit')
+      })
+
+      it('fetches the service week', async () => {
+        expect(serviceStore.selectedWeekData).toBeDefined()
+        expect(serviceStore.selectedWeekData).toEqual(testState.editServiceStore.selectedWeekData)
+      })
+    })
   })
 
   describe('generateEmptyServiceWeek', () => {
-    it.todo('generates an empty service week')
+    it('generates an empty service week', () => {
+      const serviceStore = useServiceStore()
+      serviceStore.generateEmptyServiceWeek()
+      expect(serviceStore.selectedWeekData).toBeDefined()
+      expect(serviceStore.selectedWeekData).toEqual(testState.emptyServiceWeekData)
+    })
   })
 })

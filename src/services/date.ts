@@ -2,7 +2,23 @@ import dayjs from 'dayjs'
 import 'dayjs/locale/es'
 import weekOfYear from 'dayjs/plugin/weekOfYear'
 
-export const getWeek = () => dayjs().week()
+export const getFormattedHour = (hour: number): string => {
+  if (hour < 10) {
+    return `0${hour}:00`
+  }
+  if (hour === 24) {
+    return '00:00'
+  }
+
+  return `${hour}:00`
+}
+
+export const getWeek = () => {
+  if (!('week' in dayjs())) {
+    applyDatePlugins()
+  }
+  return dayjs().week()
+}
 export const getYear = () => dayjs().year()
 
 export const applyDatePlugins = () => {
@@ -18,19 +34,23 @@ export const lastDayOfWeek = (week: number) => {
   return dayjs().week(week).endOf('week').add(1, 'day')
 }
 
+export const nthDayOfWeek = (week: number, day: number) => {
+  return dayjs().week(week).day(day)
+}
+
 export const formatDate = (date: dayjs.Dayjs, format: string) => {
-  return dayjs(date).format(format)
+  return date.format(format)
 }
 
 export const addToDate = (type: 'day' | 'week' | 'month', date: dayjs.Dayjs, days: number) => {
   if (type === 'day') {
-    return dayjs(date).add(days, 'day')
+    return date.add(days, 'day')
   }
   if (type === 'week') {
-    return dayjs(date).add(days, 'week')
+    return date.add(days, 'week')
   }
   if (type === 'month') {
-    return dayjs(date).add(days, 'month')
+    return date.add(days, 'month')
   }
   return date
 }

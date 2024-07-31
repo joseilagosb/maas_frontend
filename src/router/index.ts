@@ -34,12 +34,20 @@ export const routes: Array<RouteRecordRaw> = [
     }),
     children: [
       {
-        path: 'week/:week',
+        path: 'weeks',
+        name: 'service-weeks',
+        redirect: (to) => ({
+          name: 'show-service-week',
+          params: { id: to.params.id, week: getWeek() }
+        })
+      },
+      {
+        path: 'weeks/:week',
         name: 'show-service-week',
         component: ShowServiceWeekView
       },
       {
-        path: 'week/:week/edit',
+        path: 'weeks/:week/edit',
         name: 'edit-service-week',
         component: EditServiceWeekView
       }
