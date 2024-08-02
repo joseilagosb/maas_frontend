@@ -30,34 +30,6 @@ describe('EditServiceWeekGrid', () => {
   })
 
   describe('mounted', () => {
-    describe('users fetch', () => {
-      afterAll(() => {
-        vi.mocked(getUsers).mockImplementation(mockAPIService.getUsers)
-      })
-
-      it('runs the fetchUsers action', async () => {
-        shallowMountWithPinia(EditServiceWeekGrid, {
-          initialState: { ...testState.user, service: { ...testState.serviceStore } },
-          stubActions: false
-        })
-        await flushPromises()
-        const serviceStore = useServiceStore()
-        expect(serviceStore.fetchUsers).toHaveBeenCalledTimes(1)
-      })
-
-      it('renders error if it fails', async () => {
-        vi.mocked(getUsers).mockImplementationOnce(async () => {
-          return Promise.reject(new Error('error'))
-        })
-        const wrapper = shallowMountWithPinia(EditServiceWeekGrid, {
-          initialState: { ...testState.user, service: { ...testState.serviceStore } },
-          stubActions: false
-        })
-        await flushPromises()
-        expect(wrapper.find(errorMessageSelector).exists()).toBe(true)
-      })
-    })
-
     describe('active weeks does not contain selected week', () => {
       const serviceWeeksWithoutCurrentWeek = [...testData.serviceWeeks]
       serviceWeeksWithoutCurrentWeek[0].week = testTime.week - 1

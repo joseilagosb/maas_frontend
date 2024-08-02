@@ -3,7 +3,7 @@ import { useRoute } from 'vue-router'
 
 import { getWeek, nthDayOfWeek } from '@/services/date'
 
-import { getService, getServiceWeek, getUsers } from '@/services/api'
+import { getService, getServiceWeek, getUserAssignedHours } from '@/services/api'
 import { getEmptyServiceWeekData } from './utils/service'
 
 import type { ServiceState } from '@/types/stores'
@@ -12,10 +12,12 @@ import type { Service, ServiceWeek } from '@/types/models'
 const getDefaultServiceState = (): ServiceState => {
   const route = useRoute()
   const selectedWeek = route.params.week ? +route.params.week : getWeek()
+  const selectedServiceId = +route.params.id!
   return {
     service: undefined,
-    users: [],
+    userAssignedHours: [],
     activeWeeks: [],
+    selectedServiceId,
     selectedWeek,
     selectedWeekData: undefined
   }
@@ -43,9 +45,9 @@ export const useServiceStore = defineStore('service', {
     }
   },
   actions: {
-    async fetchService(id: number) {
+    async fetchService() {
       try {
-        const service = await getService(id)
+        const service = await getService(this.selectedServiceId)
         this.service = {
           id: service.id,
           type: service.type,
@@ -53,39 +55,41 @@ export const useServiceStore = defineStore('service', {
           active: service.active,
           serviceWorkingDays: service.serviceWorkingDays
         } as Service
-        const activeWeeks = service.serviceWeeks.map((serviceWeek: any) => +serviceWeek.week)
+        const activeWeeks = service.serviceWeeks.map((serviceWeek: ServiceWeek) => +serviceWeek.week)
         this.activeWeeks = activeWeeks
       } catch (error) {
         throw error
       }
     },
-    async fetchUsers() {
+    async fetchUserAssignedHours() {
       try {
-        const users = await getUsers()
-        if (!users) {
-          throw new Error('No users were found')
-        }
-        this.users = users
+        const userAssignedHours = await getUserAssignedHours(
+          this.selectedServiceId,
+          this.selectedWeek
+        )
+        this.userAssignedHours = userAssignedHours
       } catch (error) {
         throw error
       }
     },
-    async fetchServiceWeek(id: number, week: number, mode: 'show' | 'edit' = 'show') {
+    async fetchServiceWeek(mode: 'show' | 'edit' = 'show') {
       try {
-        const selectedWeekData = await getServiceWeek(id, week, mode)
+        const selectedWeekData = await getServiceWeek(
+          this.selectedServiceId,
+          this.selectedWeek,
+          mode
+        )
         this.selectedWeekData = selectedWeekData
       } catch (error) {
         throw error
       }
     },
     generateEmptyServiceWeek() {
-      const serviceWorkingDays = this.service!.serviceWorkingDays
       try {
         const serviceWeekData: ServiceWeek = getEmptyServiceWeekData(
-          serviceWorkingDays,
+          this.service,
           this.selectedWeek
         )
-
         this.selectedWeekData = serviceWeekData
       } catch (error) {
         throw error

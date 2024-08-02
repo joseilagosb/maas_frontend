@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { onMounted, ref, watch } from 'vue'
-import { useRoute } from 'vue-router'
 import { storeToRefs } from 'pinia'
 
 import { USER_TAILWIND_COLORS } from '@/utils/constants'
@@ -12,38 +11,24 @@ import { useServiceStore } from '@/stores/service'
 const loading = ref(true)
 const isErrorVisible = ref(false)
 
-const route = useRoute()
-
 const serviceStore = useServiceStore()
 
-const { dayOfServiceWeek, selectedWeekData, weekContainsData, selectedWeek } = storeToRefs(serviceStore)
+const { userAssignedHours, dayOfServiceWeek, selectedWeekData, weekContainsData, selectedWeek } = storeToRefs(serviceStore)
 
-const refreshGrid = () => {
+watch([userAssignedHours, selectedWeek], () => {
+  loading.value = true
+  isErrorVisible.value = false
+
   if (!weekContainsData.value) {
     serviceStore.generateEmptyServiceWeek()
     loading.value = false
     return
   }
 
-  loading.value = true
-  isErrorVisible.value = false
-
   serviceStore
-    .fetchServiceWeek(+route.params.id, selectedWeek.value)
-    .catch(() => {
-      isErrorVisible.value = true
-    })
-    .finally(() => {
-      loading.value = false
-    })
-}
-
-onMounted(() => {
-  refreshGrid()
-})
-
-watch([selectedWeek], () => {
-  refreshGrid()
+    .fetchServiceWeek()
+    .catch(() => { isErrorVisible.value = true })
+    .finally(() => { loading.value = false })
 })
 </script>
 
@@ -53,9 +38,6 @@ watch([selectedWeek], () => {
   </div>
   <div v-else-if="isErrorVisible" class="flex flex-col gap-4 items-start justify-start" data-testid="error-message">
     <h1 class="text-2xl font-bold">Error al cargar el calendario</h1>
-    <button class="px-2 py-1 bg-orange-500 rounded-lg text-white" @click="refreshGrid">
-      Volver a intentar
-    </button>
   </div>
   <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 auto-rows-max gap-2" data-testid="grid">
     <div v-for="({ day, serviceHours: hours }, dayIndex) in selectedWeekData!.serviceDays" :key="day"
@@ -68,7 +50,7 @@ watch([selectedWeek], () => {
       <div class="w-full flex flex-row mb-[2px]" :class="[
         { 'bg-gray-400': !designatedUser },
         designatedUser && `${USER_TAILWIND_COLORS[designatedUser.color]}`,
-        { 'm-[20px]': hourIndex === 0 }
+        { 'mt-[40px]': hourIndex === 0 }
       ]" v-for="({ hour, designatedUser }, hourIndex) in hours" :key="hour" :data-testdayindex="dayIndex"
         :data-testhourindex="hourIndex" data-testid="grid-hour">
         <div class="w-[40%] flex items-center justify-center">
@@ -79,7 +61,7 @@ watch([selectedWeek], () => {
         <div class="w-[60%] flex items-center justify-center">
           <span class="text-sm font-bold" data-testid="grid-hour-designated-user">{{
             designatedUser ? designatedUser.name : 'Sin asignar'
-            }}</span>
+          }}</span>
         </div>
       </div>
     </div>

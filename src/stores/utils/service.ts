@@ -1,11 +1,23 @@
-import type { ServiceDay, ServiceHour, ServiceWeek, ServiceWorkingDay } from '@/types/models'
+import type {
+  Service,
+  ServiceDay,
+  ServiceHour,
+  ServiceWeek,
+  ServiceWorkingDay
+} from '@/types/models'
 
 import { getArrayFromInterval } from '@/utils/common'
 
 export const getEmptyServiceWeekData = (
-  serviceWorkingDays: ServiceWorkingDay[],
+  service: Service | undefined,
   week: number
 ): ServiceWeek => {
+  if (!service) {
+    throw new Error('Service must not be empty, the service week cannot be generated')
+  }
+
+  const serviceWorkingDays = service.serviceWorkingDays
+
   if (serviceWorkingDays.length === 0) {
     throw new Error('ServiceWorkingDays must not be empty, the service week cannot be generated')
   }

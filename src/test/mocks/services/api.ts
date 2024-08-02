@@ -16,5 +16,5 @@ export const mockAPIService = {
         return Promise.resolve(testResponses.showServiceWeek)
     }
   },
-  getUsers: () => Promise.resolve(testData.users)
+  getUserAssignedHours: () => Promise.resolve(testResponses.userAssignedHours)
 }

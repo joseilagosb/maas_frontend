@@ -19,11 +19,15 @@ const forEveryAvailabilityHour = (
 }
 
 describe('Service Availability Utils', () => {
-  const { users, selectedWeekData } = testState.editServiceStore
+  const { userAssignedHours, selectedWeekData } = testState.editServiceStore
 
   describe('getAvailabilityData', () => {
     describe('parameters', () => {
-      it('throws an error if an empty users array is passed', () => {
+      it('throws an error if service week data is undefined', () => {
+        expect(() => getAvailabilityData(testTime.week, undefined, userAssignedHours)).toThrow()
+      })
+
+      it('throws an error if an empty user assigned hours array is passed', () => {
         expect(() => getAvailabilityData(testTime.week, selectedWeekData, [])).toThrow()
       })
 
@@ -32,7 +36,9 @@ describe('Service Availability Utils', () => {
           ...selectedWeekData,
           serviceDays: []
         }
-        expect(() => getAvailabilityData(testTime.week, weekDataWithoutDays, users)).toThrow()
+        expect(() =>
+          getAvailabilityData(testTime.week, weekDataWithoutDays, userAssignedHours)
+        ).toThrow()
       })
 
       it('throws an error if service week data with a day without hours is passed', () => {
@@ -41,12 +47,16 @@ describe('Service Availability Utils', () => {
           serviceDays: [{ ...selectedWeekData.serviceDays[0], serviceHours: [] }]
         }
         expect(() =>
-          getAvailabilityData(testTime.week, weekDataWithDayWithoutHours, users)
+          getAvailabilityData(testTime.week, weekDataWithDayWithoutHours, userAssignedHours)
         ).toThrow()
       })
     })
 
-    const currentAvailability = getAvailabilityData(testTime.week, selectedWeekData, users)
+    const currentAvailability = getAvailabilityData(
+      testTime.week,
+      selectedWeekData,
+      userAssignedHours
+    )
     const { currentAvailability: expectedCurrentAvailability } = testState.serviceAvailabilityStore
 
     describe('week', () => {
@@ -93,7 +103,7 @@ describe('Service Availability Utils', () => {
           currentAvailability,
           expectedCurrentAvailability,
           (result, expected) => {
-            expect(result.available.length).toEqual(users.length)
+            expect(result.available.length).toEqual(userAssignedHours.length)
             expect(result.available.length).toEqual(expected.available.length)
           }
         )

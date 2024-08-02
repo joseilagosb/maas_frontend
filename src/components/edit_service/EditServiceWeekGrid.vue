@@ -1,7 +1,6 @@
 <script setup lang="ts">
-import { onMounted, ref, watch } from 'vue'
+import { ref, watch } from 'vue'
 import { storeToRefs } from 'pinia'
-import { useRoute } from 'vue-router'
 
 import { useServiceStore } from '@/stores/service'
 import { useAuthStore } from '@/stores/auth'
@@ -14,29 +13,15 @@ import { USER_TAILWIND_COLORS } from '@/utils/constants'
 const loading = ref(true)
 const isErrorVisible = ref(false)
 
-const route = useRoute()
-
 const authStore = useAuthStore()
 const serviceStore = useServiceStore()
 const serviceAvailabilityStore = useServiceAvailabilityStore()
 const { availabilityData } = storeToRefs(serviceAvailabilityStore)
-const { users, weekContainsData, selectedWeek, selectedWeekData, dayOfServiceWeek } = storeToRefs(serviceStore)
+const { userAssignedHours, weekContainsData, selectedWeek, selectedWeekData, dayOfServiceWeek } = storeToRefs(serviceStore)
 
-const refreshGrid = async () => {
+watch([userAssignedHours, selectedWeek], () => {
   loading.value = true
   isErrorVisible.value = false
-
-  const usersFetchedSuccess = await serviceStore.fetchUsers()
-    .then(() => true)
-    .catch(() => {
-      loading.value = false
-      isErrorVisible.value = true
-      return false
-    })
-
-  if (!usersFetchedSuccess) {
-    return
-  }
 
   if (!weekContainsData.value) {
     serviceStore.generateEmptyServiceWeek()
@@ -46,24 +31,10 @@ const refreshGrid = async () => {
   }
 
   serviceStore
-    .fetchServiceWeek(+route.params.id, selectedWeek.value, 'edit')
-    .then(() => {
-      serviceAvailabilityStore.generateAvailability()
-    })
-    .catch(() => {
-      isErrorVisible.value = true
-    })
-    .finally(() => {
-      loading.value = false
-    })
-}
-
-onMounted(() => {
-  refreshGrid()
-})
-
-watch([selectedWeek], () => {
-  refreshGrid()
+    .fetchServiceWeek('edit')
+    .then(() => { serviceAvailabilityStore.generateAvailability() })
+    .catch(() => { isErrorVisible.value = true })
+    .finally(() => { loading.value = false })
 })
 </script>
 
@@ -73,9 +44,6 @@ watch([selectedWeek], () => {
   </div>
   <div v-else-if="isErrorVisible" class="flex flex-col gap-4 items-start justify-start" data-testid="error-message">
     <h1 class="text-2xl font-bold">Error al cargar el calendario</h1>
-    <button class="px-2 py-1 bg-orange-500 rounded-lg text-white" @click="refreshGrid">
-      Volver a intentar
-    </button>
   </div>
   <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 auto-rows-max gap-2" data-testid="grid">
     <div v-for="({ day, serviceHours: hours }, dayIndex) in selectedWeekData!.serviceDays" :key="day"
@@ -88,7 +56,8 @@ watch([selectedWeek], () => {
       <div class="flex flex-row w-full" data-testid="grid-header">
         <div class="w-[30%] mt-[40px]"></div>
         <div class="text-center mt-[40px]" :class="[`${USER_TAILWIND_COLORS[user.color]}`]"
-          :style="[`width: calc(${70 / users.length}%)`]" v-for="user in users" data-testid="grid-header-user">
+          :style="[`width: calc(${70 / userAssignedHours.length}%)`]" v-for="user in userAssignedHours"
+          data-testid="grid-header-user">
           <span class="text-sm font-bold">{{ user.name }}</span>
         </div>
       </div>
@@ -98,8 +67,8 @@ watch([selectedWeek], () => {
           <span class="text-sm text-light" data-testid="grid-hour-time">{{ getFormattedHour(hour) }}-{{
             getFormattedHour(hour + 1) }}</span>
         </div>
-        <div v-for="(user, userIndex) in users" :key="user.id" class="text-center"
-          :class="[`${USER_TAILWIND_COLORS[user.color]}`]" :style="[`width: calc(${70 / users.length}%)`]"
+        <div v-for="(user, userIndex) in userAssignedHours" :key="user.id" class="text-center"
+          :class="[`${USER_TAILWIND_COLORS[user.color]}`]" :style="[`width: calc(${70 / userAssignedHours.length}%)`]"
           data-testid="grid-hour-user" :data-testuserid="user.id">
           <input class="rounded size-5" type="checkbox"
             v-model="availabilityData!.serviceDays[dayIndex].serviceHours[hourIndex].available[userIndex]"

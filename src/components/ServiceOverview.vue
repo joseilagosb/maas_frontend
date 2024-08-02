@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { computed, onMounted, ref } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
+import { computed, onMounted, ref, watch } from 'vue'
+import { useRouter } from 'vue-router'
 import { storeToRefs } from 'pinia'
 
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
@@ -12,12 +12,13 @@ import { useServiceStore } from '@/stores/service'
 import { formatDate, getWeek, getYear } from '@/services/date'
 
 import { addToSortedArray, getArrayFromInterval } from '@/utils/common'
+import { USER_TAILWIND_COLORS } from '@/utils/constants'
 
 const loading = ref(true)
 const isErrorVisible = ref(false)
 
 const serviceStore = useServiceStore()
-const { service, dayOfServiceWeek, selectedWeek, activeWeeks } = storeToRefs(serviceStore)
+const { service, userAssignedHours, dayOfServiceWeek, selectedWeek, activeWeeks, weekContainsData } = storeToRefs(serviceStore)
 
 const weekOptions = computed(() => {
   const currentWeek = getWeek()
@@ -30,32 +31,31 @@ const weekOptions = computed(() => {
   return [...addToSortedArray(activeWeeks.value, currentWeek), ...additionalWeeks]
 })
 
-const route = useRoute()
 const router = useRouter()
-
-const refreshService = () => {
-  serviceStore
-    .fetchService(+route.params.id)
-    .catch(() => {
-      isErrorVisible.value = true
-    })
-    .finally(() => {
-      loading.value = false
-    })
-}
 
 const onChangeWeek = () => {
   router.replace({ params: { week: selectedWeek.value } })
 }
 
+watch([service, selectedWeek], () => {
+  serviceStore.fetchUserAssignedHours()
+    .catch(() => { isErrorVisible.value = true })
+    .finally(() => { loading.value = false })
+})
+
 onMounted(() => {
-  refreshService()
+  serviceStore.fetchService()
+    .catch(() => { isErrorVisible.value = true })
+    .finally(() => { loading.value = false })
 })
 </script>
 
 <template>
   <div v-if="loading" class="flex flex-col gap-4 items-start justify-start">
     <h1 class="text-2xl font-bold">Cargando...</h1>
+  </div>
+  <div v-else-if="isErrorVisible" class="flex flex-col gap-4 items-start justify-start" data-testid="error-message">
+    <h1 class="text-2xl font-bold">Servicio no encontrado</h1>
   </div>
   <div v-else-if="service" class="size-full flex flex-col gap-4 items-start justify-start p-2" data-testid="service">
     <div class="w-full flex justify-between items-start pt-8">
@@ -86,21 +86,20 @@ onMounted(() => {
           <FontAwesomeIcon :icon="faClock" class="text-md pr-2" />
           <span>Horas asignadas</span>
         </h3>
-        <div class="border border-black rounded-xl py-1 flex flex-col gap-1 overflow-hidden"
-          data-testid="assigned-hours-count">
-          <div class="h-[40px] w-full px-4 bg-green-400 flex items-center justify-between">
-            <span class="font-light text-lg">Cristiano Ronaldo</span>
-            <span class="font-light text-lg">19</span>
+        <div class="border border-black rounded-xl py-1 flex flex-col gap-1 overflow-hidden">
+          <div v-if="!weekContainsData" class="px-4 py-4 text-center" data-testid="empty-week-message">
+            <span class="font-light text-3xl">Todavía no se han asignado usuarios para esta semana.</span>
           </div>
-          <div class="h-[40px] w-full px-4 bg-red-500 flex items-center justify-between">
-            <span class="font-light text-lg">Luka Modric</span>
-            <span class="font-light text-lg">16</span>
+          <div v-else class="h-[40px] w-full px-4 flex items-center justify-between"
+            :class="[`${USER_TAILWIND_COLORS[user.color]}`]" v-for="user in userAssignedHours" :key="user.id"
+            data-testid="user-assigned-hours">
+            <span class="font-light text-lg">{{ user.name }}</span>
+            <span class="font-light text-lg">{{ user.hoursCount }}</span>
           </div>
-          <div class="h-[40px] w-full px-4 bg-blue-300 flex items-center justify-between">
-            <span class="font-light text-lg">Toni Kroos</span>
-            <span class="font-light text-lg">15</span>
-          </div>
-          <p class="py-1 font-bold text-center text-sm text-gray-500">3 horas sin asignar</p>
+          <p class="font-bold text-center text-sm text-gray-500" data-testid="unassigned-hours-message">{{ "X" }} horas
+            {{
+              weekContainsData ? "sin asignar" :
+                "disponibles" }}</p>
         </div>
       </div>
       <div class="w-[80%] overflow-y-auto tiny-scrollbar">
@@ -108,9 +107,7 @@ onMounted(() => {
       </div>
     </div>
   </div>
-  <div v-else class="flex flex-col gap-4 items-start justify-start" data-testid="error-message">
-    <h1 class="text-2xl font-bold">Servicio no encontrado</h1>
-  </div>
+  <div v-else></div>
 </template>
 
 <style></style>

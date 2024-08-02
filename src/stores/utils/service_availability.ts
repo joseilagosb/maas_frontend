@@ -1,11 +1,22 @@
-import type { Availability, ServiceDay, ServiceHour, ServiceWeek, User } from '@/types/models'
+import type {
+  Availability,
+  ServiceDay,
+  ServiceHour,
+  ServiceWeek,
+  User,
+  UserAssignedHours
+} from '@/types/models'
 
 export const getAvailabilityData = (
   selectedWeek: number,
-  selectedWeekData: ServiceWeek,
-  users: User[]
+  selectedWeekData: ServiceWeek | undefined,
+  userAssignedHours: UserAssignedHours[]
 ): Availability => {
-  if (users.length === 0) {
+  if (!selectedWeekData) {
+    throw new Error('No service week data found, the availability cannot be calculated')
+  }
+
+  if (userAssignedHours.length === 0) {
     throw new Error('No users were passed, the availability cannot be calculated')
   }
 
@@ -22,11 +33,11 @@ export const getAvailabilityData = (
       const serviceDayHours = serviceDay.serviceHours.map((serviceHour: ServiceHour) => {
         let availableArr
         if (serviceHour.users) {
-          availableArr = users.map((user: User) =>
+          availableArr = userAssignedHours.map((user: UserAssignedHours) =>
             serviceHour.users!.some((availableUser: User) => availableUser.id === user.id)
           )
         } else {
-          availableArr = Array(users.length).fill(false)
+          availableArr = Array(userAssignedHours.length).fill(false)
         }
 
         return {

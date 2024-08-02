@@ -48,13 +48,15 @@ export const getServices = async () => {
     })
 }
 
-export const getUsers = async () => {
+export const getUserAssignedHours = async (serviceId: number, week: number) => {
   return axios
-    .get(`${API_BASE_URL}/users`)
+    .get(`${API_BASE_URL}/users/assigned_hours`, {
+      params: { user_assigned_hours: { week, service_id: serviceId } }
+    })
     .then(async (response) => {
       const parsedResponseData = response.data
-      const users = await JSONDeserializer.deserialize(parsedResponseData)
-      return users
+      const userAssignedHours = await JSONDeserializer.deserialize(parsedResponseData)
+      return userAssignedHours
     })
     .catch((error: Error) => {
       throw error
@@ -75,7 +77,7 @@ export const getService = async (id: number) => {
     })
 }
 
-export const getServiceWeek = async (id: number, week: number, mode: 'show' | 'edit' = 'show') => {
+export const getServiceWeek = async (id: number, week: number, mode: 'show' | 'edit') => {
   let url = `${API_BASE_URL}/services/${id}/service_weeks/${week}`
   if (mode === 'edit') {
     url += '/edit'

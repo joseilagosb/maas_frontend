@@ -41,6 +41,10 @@ export type ServiceHour = {
   users?: User[]
 }
 
+export type UserAssignedHours = Omit<User, 'email, role'> & {
+  hoursCount: number
+}
+
 export type Availability = {
   week: number
   serviceDays: AvailabilityDay[]

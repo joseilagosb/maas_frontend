@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 
 import { getEmptyServiceWeekData } from '@/stores/utils/service'
 
-import { testState, testTime } from '@/test/data'
+import { testData, testState, testTime } from '@/test/data'
 import type { ServiceHour, ServiceWeek } from '@/types/models'
 
 const forEveryServiceWeekHour = (
@@ -23,12 +23,15 @@ describe('Service Utils', () => {
     const { serviceWorkingDays } = testState.showServiceStore.service
 
     describe('parameters', () => {
-      it('throws an error if an empty service working days is passed', () => {
-        expect(() => getEmptyServiceWeekData([], testTime.week)).toThrow()
+      it('throws an error if service is undefined', () => {
+        expect(() => getEmptyServiceWeekData(undefined, testTime.week)).toThrow()
       })
     })
 
-    const resultServiceWeekData = getEmptyServiceWeekData(serviceWorkingDays, testTime.week)
+    const resultServiceWeekData = getEmptyServiceWeekData(
+      testState.serviceStore.service,
+      testTime.week
+    )
     const expectedServiceWeekData = testState.emptyServiceWeekData
 
     const { serviceDays: resultServiceDays } = resultServiceWeekData

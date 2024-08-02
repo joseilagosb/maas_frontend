@@ -1,4 +1,5 @@
-import type { ServiceHour } from '@/types/models'
+import type { ServiceHour, User, UserAssignedHours } from '@/types/models'
+import type { ServiceState } from '@/types/stores'
 import { getArrayFromInterval } from '@/utils/common'
 
 // Contexto: Todos los servicios trabajan 3 días a la semana (Lunes, Martes y Miércoles)
@@ -88,10 +89,28 @@ export const testData = {
   get serviceWeeks() {
     return [{ id: 1, week: testTime.week, serviceDays: this.serviceDays }]
   },
-  get users() {
+  get users(): User[] {
     return [testData.user, testData.notDesignatedUser]
+  },
+  get userAssignedHours(): UserAssignedHours[] {
+    return [
+      {
+        id: testData.users[0].id,
+        name: testData.users[0].name,
+        color: testData.users[0].color,
+        hoursCount: 8
+      },
+      {
+        id: testData.users[1].id,
+        name: testData.users[1].name,
+        color: testData.users[1].color,
+        hoursCount: 2
+      }
+    ] as UserAssignedHours[]
   }
 }
+
+export const testParams = { service: { week: testTime.week, id: testData.service.id } }
 
 export const testResponses = {
   service: {
@@ -109,7 +128,8 @@ export const testResponses = {
       ...serviceDay,
       serviceHours: testData.serviceHoursDefaultWithUsers
     }))
-  }
+  },
+  userAssignedHours: testData.userAssignedHours
 }
 
 export const testState = {
@@ -122,7 +142,7 @@ export const testState = {
       serviceWorkingDays: [...testData.serviceWorkingDays]
     },
     activeWeeks: testData.serviceWeeks.map((serviceWeek: any) => serviceWeek.week),
-    users: testData.users
+    userAssignedHours: testData.userAssignedHours
   },
   get showServiceStore() {
     return {
