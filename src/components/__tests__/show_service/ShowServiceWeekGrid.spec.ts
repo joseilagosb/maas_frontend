@@ -15,10 +15,11 @@ import { prepareFormatDateMethods, shallowMountWithPinia } from '@/test/utils'
 import { mockDateService } from '@/test/mocks/services/date'
 
 import { USER_TAILWIND_COLORS } from '@/utils/constants'
+import type { User } from '@/types/models'
 
 describe('ShowServiceWeekGrid', () => {
   vi.mock('vue-router')
-  vi.mocked(useRoute).mockReturnValue({ params: { week: testTime.week } } as any)
+  vi.mocked(useRoute).mockReturnValue({ params: { week: testParams.service } } as any)
 
   let wrapper: VueWrapper<ComponentPublicInstance<typeof ShowServiceWeekGrid>>
   let serviceStore: ReturnType<typeof useServiceStore>
@@ -26,12 +27,8 @@ describe('ShowServiceWeekGrid', () => {
   beforeEach(async () => {
     wrapper = shallowMountWithPinia(ShowServiceWeekGrid, {
       initialState: {
-        ...testState.user,
-        service: {
-          ...testState.serviceStore,
-          selectedWeek: testTime.week,
-          activeWeeks: [...testState.serviceStore.activeWeeks]
-        }
+        user: testState.userAuthStore,
+        service: testState.serviceStore
       },
       stubActions: false
     })
@@ -77,7 +74,7 @@ describe('ShowServiceWeekGrid', () => {
             // Cambiamos el estado de selectedWeek a dos semanas atrás, que no está contenida en activeWeeks
             // Esto hará que la action generateEmptyServiceWeek sea llamada
             serviceStore.$patch({ selectedWeek: testTime.week - 2 })
-            await wrapper.vm.$nextTick()
+            await flushPromises()
           })
 
           it('runs the generateEmptyServiceWeek action', () => {
@@ -89,7 +86,7 @@ describe('ShowServiceWeekGrid', () => {
       describe('user assigned hours', () => {
         beforeEach(async () => {
           serviceStore.$patch({ userAssignedHours: [] })
-          await wrapper.vm.$nextTick()
+          await flushPromises()
         })
 
         it('runs the fetchServiceWeek action', () => {
@@ -143,14 +140,15 @@ describe('ShowServiceWeekGrid', () => {
       // para formatDateInSpanish
       vi.mocked(getFormattedHour).mockClear()
       prepareFormatDateMethods()
-      // Esto acciona el watcher
-      serviceStore.$patch({ userAssignedHours: [...testData.userAssignedHours] })
+
+      serviceStore.$patch({ ...testState.showServiceStore })
       await flushPromises()
     })
 
     describe('grid', () => {
       describe('days', () => {
         const gridDaysSelector = '[data-testid="grid-day"]'
+        const gridDayDateSelector = '[data-testid="grid-day-date"]'
 
         afterAll(() => {
           vi.mocked(getFormattedHour).mockImplementation(mockDateService.getFormattedHour)
@@ -167,7 +165,7 @@ describe('ShowServiceWeekGrid', () => {
 
         it('renders the date in the correct format', () => {
           wrapper.findAll(gridDaysSelector).forEach((gridDay, dayIndex) => {
-            const gridDayDate = gridDay.find('[data-testid="grid-day-date"]').text()
+            const gridDayDate = gridDay.find(gridDayDateSelector).text()
             expect(gridDayDate).toEqual(testTime.date.inSpanish[dayIndex])
           })
         })
@@ -175,32 +173,28 @@ describe('ShowServiceWeekGrid', () => {
 
       describe('hours', () => {
         const gridHoursSelector = '[data-testid="grid-hour"]'
+        const gridHourTimeSelector = '[data-testid="grid-hour-time"]'
+        const gridHourDesignatedUserSelector = '[data-testid="grid-hour-designated-user"]'
+
+        const expectedTotalHours = testData.serviceDays.reduce(
+          (acc, day) => acc + day.serviceHours.length,
+          0
+        )
 
         it('renders the correct number of hours', () => {
-          const gridHours = wrapper.findAll(gridHoursSelector)
-          const totalHours = testData.serviceDays.reduce(
-            (acc, day) => acc + day.serviceHours.length,
-            0
-          )
-          expect(gridHours.length).toEqual(totalHours)
+          expect(wrapper.findAll(gridHoursSelector).length).toEqual(expectedTotalHours)
         })
 
         it('calls the formatting methods', () => {
-          const totalHours = testData.serviceDays.reduce(
-            (acc, day) => acc + day.serviceHours.length,
-            0
-          )
-          expect(getFormattedHour).toHaveBeenCalledTimes(totalHours * 2)
+          expect(getFormattedHour).toHaveBeenCalledTimes(expectedTotalHours * 2)
         })
 
         it('renders each hour in the correct format', () => {
+          const expectedServiceHours = testData.serviceHours
           wrapper.findAll(gridHoursSelector).forEach((gridHour) => {
-            const gridHourTime = gridHour.find('[data-testid="grid-hour-time"]').text()
-            const gridDayIndex = gridHour.attributes()['data-testdayindex']
+            const gridHourTime = gridHour.find(gridHourTimeSelector).text()
             const gridHourIndex = gridHour.attributes()['data-testhourindex']
-
-            const expectedHour =
-              testData.serviceDays[+gridDayIndex].serviceHours[+gridHourIndex].hour
+            const expectedHour = expectedServiceHours[+gridHourIndex].hour
 
             expect(gridHourTime).toEqual(expectedHour + ':00' + '-' + (expectedHour + 1) + ':00')
           })
@@ -208,19 +202,16 @@ describe('ShowServiceWeekGrid', () => {
 
         describe('service week with a designated user', () => {
           it('renders the designated user', () => {
+            const expectedServiceHours = testData.serviceHoursWithDesignatedUser
             wrapper.findAll(gridHoursSelector).forEach((gridHour) => {
-              const gridHourDesignatedUser = gridHour
-                .find('[data-testid="grid-hour-designated-user"]')
-                .text()
-              const gridDayIndex = gridHour.attributes()['data-testdayindex']
+              const gridHourDesignatedUser = gridHour.find(gridHourDesignatedUserSelector).text()
               const gridHourIndex = gridHour.attributes()['data-testhourindex']
+              const expectedDesignatedUser: User =
+                expectedServiceHours[+gridHourIndex].designatedUser
 
-              const expectedDesignatedUser =
-                testData.serviceDays[+gridDayIndex].serviceHours[+gridHourIndex].designatedUser
-
-              expect(gridHourDesignatedUser).toEqual(expectedDesignatedUser!.name)
+              expect(gridHourDesignatedUser).toEqual(expectedDesignatedUser.name)
               expect(gridHour.classes()).toContain(
-                USER_TAILWIND_COLORS[expectedDesignatedUser!.color]
+                USER_TAILWIND_COLORS[expectedDesignatedUser.color]
               )
             })
           })
@@ -233,20 +224,16 @@ describe('ShowServiceWeekGrid', () => {
 
           beforeEach(async () => {
             // Asignamos un serviceWeekData vacío, es decir, sin usuarios asignados
-            serviceStore.$patch({ selectedWeekData: testState.emptyServiceWeekData })
-            await flushPromises()
+            serviceStore.$patch({ ...testState.showServiceStoreWithoutDesignatedUser })
+            await wrapper.vm.$nextTick()
           })
 
           it('renders not assigned when there is no designated user', async () => {
+            const expectedServiceHours = testData.serviceHoursWithoutDesignatedUser
             wrapper.findAll(gridHoursSelector).forEach((gridHour) => {
-              const gridHourDesignatedUser = gridHour
-                .find('[data-testid="grid-hour-designated-user"]')
-                .text()
-              const gridDayIndex = gridHour.attributes()['data-testdayindex']
+              const gridHourDesignatedUser = gridHour.find(gridHourDesignatedUserSelector).text()
               const gridHourIndex = gridHour.attributes()['data-testhourindex']
-
-              const expectedDesignatedUser =
-                testData.serviceDays[+gridDayIndex].serviceHours[+gridHourIndex].designatedUser
+              const expectedDesignatedUser = expectedServiceHours[+gridHourIndex].designatedUser
 
               expect(gridHourDesignatedUser).toEqual(expectedDesignatedUser ? 'Sin asignar' : '')
               expect(gridHour.classes()).toContain('bg-gray-400')

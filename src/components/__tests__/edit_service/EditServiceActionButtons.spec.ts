@@ -8,11 +8,11 @@ import EditServiceActionButtons from '@/components/edit_service/EditServiceActio
 
 import { useServiceAvailabilityStore } from '@/stores/service_availability'
 
-import { testState, testTime } from '@/test/data'
+import { testParams, testState } from '@/test/data'
 
 describe('EditServiceActionButtons', () => {
   vi.mock('vue-router')
-  vi.mocked(useRoute).mockReturnValue({ params: { id: testTime.week } } as any)
+  vi.mocked(useRoute).mockReturnValue({ params: testParams.service } as any)
 
   afterAll(() => {
     vi.restoreAllMocks()
@@ -24,7 +24,9 @@ describe('EditServiceActionButtons', () => {
   const wrapper = shallowMount(EditServiceActionButtons, {
     global: {
       plugins: [
-        createTestingPinia({ initialState: { ...testState.user, selectedWeek: testTime.week } })
+        createTestingPinia({
+          initialState: { user: testState.userAuthStore, service: testState.editServiceStore }
+        })
       ],
       stubs: {
         RouterLink: RouterLinkStub
@@ -42,10 +44,7 @@ describe('EditServiceActionButtons', () => {
     })
 
     it('links to the correct route', () => {
-      const expectedRoute = {
-        name: 'show-service-week',
-        params: { id: testTime.week }
-      }
+      const expectedRoute = { name: 'show-service-week' }
 
       expect(discardChangesButton.props('to')).toEqual(expectedRoute)
     })

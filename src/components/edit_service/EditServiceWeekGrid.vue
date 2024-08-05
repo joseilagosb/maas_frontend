@@ -69,7 +69,7 @@ watch([userAssignedHours, selectedWeek], () => {
         </div>
         <div v-for="(user, userIndex) in userAssignedHours" :key="user.id" class="text-center"
           :class="[`${USER_TAILWIND_COLORS[user.color]}`]" :style="[`width: calc(${70 / userAssignedHours.length}%)`]"
-          data-testid="grid-hour-user" :data-testuserid="user.id">
+          data-testid="grid-hour-user" :data-testhourindex="hourIndex" :data-testuserid="user.id">
           <input class="rounded size-5" type="checkbox"
             v-model="availabilityData!.serviceDays[dayIndex].serviceHours[hourIndex].available[userIndex]"
             @change="serviceAvailabilityStore.changedAvailability = true" :disabled="+user.id !== authStore.user.id"

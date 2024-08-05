@@ -1,38 +1,20 @@
-import { describe, it, expect, vi, afterAll, afterEach } from 'vitest'
-import { shallowMount } from '@vue/test-utils'
-import { createTestingPinia } from '@pinia/testing'
-import { useRouter } from 'vue-router'
+import { describe, it, expect, vi, afterAll } from 'vitest'
 
 import LoginForm from '../LoginForm.vue'
-import { mockUseRouter } from '@/test/mocks/use_router'
-
-const setUseRouter = (routeName: string, query?: Record<string, string>) => {
-  vi.mocked(useRouter).mockReturnValue(mockUseRouter(routeName, query))
-}
+import { setUseRouterMock, shallowMountWithPinia } from '@/test/utils'
+import { testData, testState } from '@/test/data'
 
 describe('LoginForm', () => {
-  afterEach(() => {
-    setUseRouter('login')
-  })
-
+  vi.mock('vue-router')
   afterAll(() => {
     vi.restoreAllMocks()
   })
 
-  vi.mock('vue-router')
-  setUseRouter('home')
-
-  const validUser = { id: 1, email: 'cristiano@gmail.com', password: 'contrasena' }
-  const wrapper = shallowMount(LoginForm, {
-    global: {
-      plugins: [
-        createTestingPinia({
-          initialState: { auth: { isLoggedIn: false, user: { id: 0, name: '', email: '' } } },
-          createSpy: vi.fn
-        })
-      ]
-    }
+  setUseRouterMock('home')
+  const wrapper = shallowMountWithPinia(LoginForm, {
+    initialState: { auth: testState.notLoggedInAuthStore }
   })
+  const errorMessageSelector = '[data-testid="error-message"]'
 
   const emailInput = wrapper.find('input[type=email]')
   const passwordInput = wrapper.find('input[type=password]')
@@ -51,9 +33,9 @@ describe('LoginForm', () => {
   })
 
   it('shows error message when credentials are incorrect', async () => {
-    const errorMessage = wrapper.find('[data-testid="error-message"]')
+    const errorMessage = wrapper.find(errorMessageSelector)
 
-    await emailInput.setValue(validUser.email)
+    await emailInput.setValue(testData.user.email)
     await passwordInput.setValue('no_es_la_contrasena')
 
     submitButton.trigger('click').catch(() => {
@@ -65,18 +47,10 @@ describe('LoginForm', () => {
     })
   })
 
-  it('shows the flash message if the user is not logged in', async () => {
-    setUseRouter('login', { redirected: 'notloggedin' })
-
-    const newWrapper = shallowMount(LoginForm, {
-      global: {
-        plugins: [
-          createTestingPinia({
-            initialState: { auth: { isLoggedIn: false, user: { id: 0, name: '', email: '' } } },
-            createSpy: vi.fn
-          })
-        ]
-      }
+  it('shows the flash message if the user is not logged in', () => {
+    setUseRouterMock('login', { redirected: 'notloggedin' })
+    const newWrapper = shallowMountWithPinia(LoginForm, {
+      initialState: { auth: testState.notLoggedInAuthStore }
     })
 
     expect(newWrapper.find('[data-testid="flash-message"]').exists()).toBe(true)

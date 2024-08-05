@@ -14,7 +14,7 @@ describe('router', async () => {
 
   describe('when the user is not logged in', () => {
     beforeEach(() => {
-      pinia = createTestingPinia({ initialState: { ...testState.notLoggedIn } })
+      pinia = createTestingPinia({ initialState: { auth: testState.notLoggedInAuthStore } })
       router = createRouter({
         history: createWebHistory(),
         routes: routes
@@ -37,7 +37,7 @@ describe('router', async () => {
     }
 
     beforeEach(() => {
-      pinia = createTestingPinia({ initialState: { ...testState.user } })
+      pinia = createTestingPinia({ initialState: { auth: testState.userAuthStore } })
       router = createRouter({
         history: createWebHistory(),
         routes: routes

@@ -22,7 +22,7 @@ watch([changedAvailability], () => {
 </script>
 
 <template>
-  <RouterLink :to="{ name: 'show-service-week', params: { id: route.params.id } }"
+  <RouterLink :to="{ name: 'show-service-week' }"
     class="flex items-center gap-4 cursor-pointer px-4 py-2 bg-orange-400 rounded-lg text-white"
     data-testid="discard-changes-button">
     <FontAwesomeIcon :icon="faArrowLeft" class="text-md" />

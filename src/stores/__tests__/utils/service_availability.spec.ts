@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 
 import { getAvailabilityData } from '@/stores/utils/service_availability'
 
-import { testState, testTime } from '@/test/data'
+import { testData, testState, testTime } from '@/test/data'
 import type { Availability, AvailabilityHour } from '@/types/models'
 
 const forEveryAvailabilityHour = (
@@ -52,37 +52,33 @@ describe('Service Availability Utils', () => {
       })
     })
 
-    const currentAvailability = getAvailabilityData(
-      testTime.week,
-      selectedWeekData,
-      userAssignedHours
-    )
-    const { currentAvailability: expectedCurrentAvailability } = testState.serviceAvailabilityStore
+    const availabilityData = getAvailabilityData(testTime.week, selectedWeekData, userAssignedHours)
+    const expectedAvailabilityData = testData.serviceAvailability
 
     describe('week', () => {
       it('contains the correct data', () => {
-        expect(currentAvailability.week).toEqual(expectedCurrentAvailability.week)
+        expect(availabilityData.week).toEqual(expectedAvailabilityData.week)
       })
 
       it('has the correct amount of days', () => {
-        expect(currentAvailability.serviceDays.length).toEqual(
-          expectedCurrentAvailability.serviceDays.length
+        expect(availabilityData.serviceDays.length).toEqual(
+          expectedAvailabilityData.serviceDays.length
         )
       })
     })
 
     describe('day', () => {
-      const expectedServiceDays = expectedCurrentAvailability.serviceDays
+      const expectedServiceDays = expectedAvailabilityData.serviceDays
 
       it('contains the correct data', () => {
         expectedServiceDays.forEach((expectedServiceDay, dayIndex) => {
-          expect(currentAvailability.serviceDays[dayIndex].day).toEqual(expectedServiceDay.day)
+          expect(availabilityData.serviceDays[dayIndex].day).toEqual(expectedServiceDay.day)
         })
       })
 
       it('has the correct amount of hours', () => {
         expectedServiceDays.forEach((expectedServiceDay, dayIndex) => {
-          expect(currentAvailability.serviceDays[dayIndex].serviceHours.length).toEqual(
+          expect(availabilityData.serviceDays[dayIndex].serviceHours.length).toEqual(
             expectedServiceDay.serviceHours.length
           )
         })
@@ -91,29 +87,21 @@ describe('Service Availability Utils', () => {
 
     describe('hour', () => {
       it('contains the correct data', () => {
-        forEveryAvailabilityHour(
-          currentAvailability,
-          expectedCurrentAvailability,
-          (result, expected) => expect(result.hour).toEqual(expected.hour)
+        forEveryAvailabilityHour(availabilityData, expectedAvailabilityData, (result, expected) =>
+          expect(result.hour).toEqual(expected.hour)
         )
       })
 
       it('has the correct amount of available users', () => {
-        forEveryAvailabilityHour(
-          currentAvailability,
-          expectedCurrentAvailability,
-          (result, expected) => {
-            expect(result.available.length).toEqual(userAssignedHours.length)
-            expect(result.available.length).toEqual(expected.available.length)
-          }
-        )
+        forEveryAvailabilityHour(availabilityData, expectedAvailabilityData, (result, expected) => {
+          expect(result.available.length).toEqual(userAssignedHours.length)
+          expect(result.available.length).toEqual(expected.available.length)
+        })
       })
 
       it('assigned the available users correctly', () => {
-        forEveryAvailabilityHour(
-          currentAvailability,
-          expectedCurrentAvailability,
-          (result, expected) => expect(result.available).toEqual(expected.available)
+        forEveryAvailabilityHour(availabilityData, expectedAvailabilityData, (result, expected) =>
+          expect(result.available).toEqual(expected.available)
         )
       })
     })

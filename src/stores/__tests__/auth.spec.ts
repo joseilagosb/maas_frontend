@@ -2,7 +2,7 @@ import { createPinia } from 'pinia'
 import { describe, expect, it, beforeEach } from 'vitest'
 import { useAuthStore } from '../auth'
 
-import { testData } from '@/test/data'
+import { testData, testState } from '@/test/data'
 
 import { NULL_OBJECTS } from '@/utils/constants'
 
@@ -10,7 +10,7 @@ describe('Auth Store', () => {
   let authStore: ReturnType<typeof useAuthStore>
   beforeEach(() => {
     authStore = useAuthStore(createPinia())
-    authStore.$patch({ isLoggedIn: false, user: { ...NULL_OBJECTS.USER } })
+    authStore.$patch({ ...testState.notLoggedInAuthStore })
   })
 
   describe('login', () => {
@@ -35,15 +35,14 @@ describe('Auth Store', () => {
 
   describe('logout', () => {
     it("doesn't log out when the user is not logged in", async () => {
-      authStore.$patch({ isLoggedIn: false, user: NULL_OBJECTS.USER })
+      authStore.$patch({ ...testState.notLoggedInAuthStore })
       expect(authStore.isLoggedIn).toBe(false)
       await authStore.logout()
       expect(authStore.isLoggedIn).toBe(false)
     })
 
     it('logs out successfully', async () => {
-      const anAlreadyLoggedInUser = { ...testData.user }
-      authStore.$patch({ isLoggedIn: true, user: anAlreadyLoggedInUser })
+      authStore.$patch({ ...testState.userAuthStore })
 
       expect(authStore.isLoggedIn).toBe(true)
       await authStore.logout()
@@ -53,25 +52,25 @@ describe('Auth Store', () => {
   })
 
   describe('isAdmin', () => {
-    it('returns true when the user is an admin', () => {
-      authStore.$patch({ isLoggedIn: true, user: { ...testData.admin } })
-      expect(authStore.isAdmin).toBe(true)
+    it('returns false when the user is not an admin', () => {
+      authStore.$patch({ ...testState.userAuthStore })
+      expect(authStore.isAdmin).toBe(false)
     })
 
-    it('returns false when the user is not an admin', () => {
-      authStore.$patch({ isLoggedIn: true, user: { ...testData.user } })
-      expect(authStore.isAdmin).toBe(false)
+    it('returns true when the user is an admin', () => {
+      authStore.$patch({ ...testState.adminAuthStore })
+      expect(authStore.isAdmin).toBe(true)
     })
   })
 
   describe('isUser', () => {
     it('returns true when the user is a user', () => {
-      authStore.$patch({ isLoggedIn: true, user: { ...testData.user } })
+      authStore.$patch({ ...testState.userAuthStore })
       expect(authStore.isUser).toBe(true)
     })
 
     it('returns false when the user is not a user', () => {
-      authStore.$patch({ isLoggedIn: true, user: { ...testData.admin } })
+      authStore.$patch({ ...testState.adminAuthStore })
       expect(authStore.isUser).toBe(false)
     })
   })

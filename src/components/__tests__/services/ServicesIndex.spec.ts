@@ -1,64 +1,93 @@
-import { describe, expect, it, vi, beforeEach } from 'vitest'
-import { flushPromises, mount, shallowMount } from '@vue/test-utils'
-import { createTestingPinia } from '@pinia/testing'
+import type { ComponentPublicInstance } from 'vue'
+import { describe, expect, it, vi, beforeEach, afterAll } from 'vitest'
+import { flushPromises, VueWrapper } from '@vue/test-utils'
 
 import ServicesIndex from '@/components/services/ServicesIndex.vue'
 
-import { testData, testState } from '@/test/data'
 import { getServices } from '@/services/api'
 
+import { testData, testState } from '@/test/data'
+import { shallowMountWithPinia } from '@/test/utils'
+import { useHomeStore } from '@/stores/home'
+
 describe('ServicesIndex', () => {
+  let wrapper: VueWrapper<ComponentPublicInstance<typeof ServicesIndex>>
+
   const errorMessageSelector = '[data-testid="error-message"]'
   const servicesSelector = '[data-testid="services"]'
   const serviceSelector = '[data-testid="service"]'
 
-  beforeEach(() => {
-    vi.mocked(getServices).mockImplementation(async () => {
-      return Promise.resolve(testData.services)
-    })
-  })
+  describe('setup', () => {
+    let wrapper: VueWrapper<ComponentPublicInstance<typeof ServicesIndex>>
 
-  it('shows services when the fetch is successful', async () => {
-    const wrapper = mount(ServicesIndex, {
-      global: {
-        plugins: [createTestingPinia({ initialState: { ...testState.user }, stubActions: false })]
-      }
-    })
-    await flushPromises()
-
-    expect(wrapper.find(servicesSelector).exists()).toBe(true)
-    expect(wrapper.findAll(serviceSelector).length).toBe(testData.services.length)
-  })
-
-  it('shows an error message when the fetch fails', async () => {
-    vi.mocked(getServices).mockImplementation(async () => {
-      return Promise.reject(new Error('error'))
-    })
-
-    const wrapper = shallowMount(ServicesIndex, {
-      global: {
-        plugins: [createTestingPinia({ initialState: { ...testState.user }, stubActions: false })]
-      }
-    })
-
-    await flushPromises()
-
-    expect(wrapper.find(errorMessageSelector).exists()).toBe(true)
-  })
-
-  describe('when a service is clicked', () => {
-    it('opens the service page', async () => {
-      const wrapper = shallowMount(ServicesIndex, {
-        global: {
-          plugins: [createTestingPinia({ initialState: { ...testState.user }, stubActions: false })]
-        }
+    beforeEach(async () => {
+      wrapper = shallowMountWithPinia(ServicesIndex, {
+        initialState: { auth: testState.userAuthStore },
+        stubActions: false
       })
-
       await flushPromises()
+    })
 
-      const firstService = testData.services[0]
-      const firstServiceElement = wrapper.findAll(serviceSelector)[0]
-      expect(firstServiceElement.html()).toContain(`to="/services/${firstService.id}"`)
+    describe('mounted', () => {
+      it('runs the fetchServices action', async () => {
+        const homeStore = useHomeStore()
+        expect(homeStore.fetchServices).toHaveBeenCalledTimes(1)
+      })
+    })
+
+    describe('actions', () => {
+      describe('fetchServices', () => {
+        afterAll(() => {
+          vi.mocked(getServices).mockImplementation(async () => {
+            return Promise.resolve(testData.services)
+          })
+        })
+
+        it('renders the services if it succeeds', () => {
+          expect(wrapper.find(servicesSelector).exists()).toBe(true)
+        })
+
+        it('renders error if it fails', async () => {
+          vi.mocked(getServices).mockImplementationOnce(async () => {
+            return Promise.reject(new Error('error'))
+          })
+          const wrapperWithError = shallowMountWithPinia(ServicesIndex, {
+            initialState: { auth: testState.userAuthStore },
+            stubActions: false
+          })
+          await flushPromises()
+
+          expect(wrapperWithError.find(errorMessageSelector).exists()).toBe(true)
+        })
+      })
+    })
+  })
+
+  describe('render', () => {
+    beforeEach(async () => {
+      wrapper = shallowMountWithPinia(ServicesIndex, {
+        initialState: { auth: testState.userAuthStore },
+        stubActions: false
+      })
+      await flushPromises()
+    })
+
+    it('renders the correct number of services', () => {
+      expect(wrapper.findAll(serviceSelector).length).toBe(testData.services.length)
+    })
+
+    it('renders the correct name for all services', () => {
+      wrapper.findAll(serviceSelector).forEach((service, serviceIndex) => {
+        const expectedService = testData.services[serviceIndex]
+        expect(service.text()).toContain(expectedService.name)
+      })
+    })
+
+    it('shows the correct router to prop for all services', () => {
+      wrapper.findAll(serviceSelector).forEach((service, serviceIndex) => {
+        const expectedService = testData.services[serviceIndex]
+        expect(service.html()).toContain(`to="/services/${expectedService.id}"`)
+      })
     })
   })
 })

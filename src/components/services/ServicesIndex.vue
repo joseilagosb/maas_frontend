@@ -1,12 +1,12 @@
 <script setup lang="ts">
-import { ref, watchEffect } from 'vue';
+import { ref, onMounted, watchEffect } from 'vue';
 import { useHomeStore } from '@/stores/home';
 
 const homeStore = useHomeStore()
 const loading = ref(true)
 const isErrorVisible = ref(false)
 
-const fetchServices = () => {
+onMounted(() => {
   homeStore
     .fetchServices()
     .catch(() => {
@@ -15,10 +15,6 @@ const fetchServices = () => {
     .finally(() => {
       loading.value = false
     })
-}
-
-watchEffect(() => {
-  fetchServices()
 })
 </script>
 <template>

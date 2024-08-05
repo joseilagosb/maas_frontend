@@ -1,6 +1,6 @@
 import type { ServiceHour, User, UserAssignedHours } from '@/types/models'
-import type { ServiceState } from '@/types/stores'
 import { getArrayFromInterval } from '@/utils/common'
+import { NULL_OBJECTS } from '@/utils/constants'
 
 // Contexto: Todos los servicios trabajan 3 días a la semana (Lunes, Martes y Miércoles)
 const SERVICE_DAYS_NUMBER = 3
@@ -48,9 +48,9 @@ export const testData = {
     role: 'admin',
     color: 'red'
   } as const,
-  service: { id: 1, type: 'service', name: 'service1', active: true },
+  service: { id: 1, type: 'service', name: 'service no.1', active: true },
   get services() {
-    return [{ ...this.service }, { id: 2, type: 'service', name: 'service2', active: true }]
+    return [{ ...this.service }, { id: 2, type: 'service', name: 'service no.2', active: true }]
   },
   serviceWorkingDays: getArrayFromInterval(1, 3).map((day: number, index: number) => ({
     id: index + 1,
@@ -58,32 +58,33 @@ export const testData = {
     from: 13,
     to: 18
   })),
-  get serviceHoursEmpty() {
-    return getArrayFromInterval(13, 18).map((hour: number) => ({
-      id: 0,
-      hour: hour,
+  serviceHours: getArrayFromInterval(13, 18).map((hour: number, index: number) => ({
+    id: index,
+    hour: hour
+  })),
+  get serviceHoursWithDesignatedUser() {
+    return this.serviceHours.map((serviceHour: any) => ({
+      ...serviceHour,
+      designatedUser: { ...testData.users[serviceHour < 16 ? 0 : 1] }
+    }))
+  },
+  get serviceHoursWithoutDesignatedUser() {
+    return this.serviceHours.map((serviceHour: any) => ({
+      ...serviceHour,
       designatedUser: undefined
     }))
   },
-  get serviceHoursDefault() {
-    return getArrayFromInterval(13, 18).map((hour: number, index: number) => ({
-      id: index,
-      hour: hour,
-      designatedUser: { ...testData.users[hour < 16 ? 0 : 1] }
-    }))
-  },
-  get serviceHoursDefaultWithUsers(): ServiceHour[] {
-    return getArrayFromInterval(13, 18).map((hour: number, index: number) => ({
-      id: index,
-      hour: hour,
+  get serviceHoursWithUsers(): ServiceHour[] {
+    return this.serviceHours.map((serviceHour: any) => ({
+      ...serviceHour,
       users: [testData.user]
-    }))
+    })) as ServiceHour[]
   },
   get serviceDays() {
     return getArrayFromInterval(1, 3).map((day: number, index: number) => ({
       id: index,
       day: day,
-      serviceHours: this.serviceHoursDefault
+      serviceHours: this.serviceHoursWithDesignatedUser
     }))
   },
   get serviceWeeks() {
@@ -107,47 +108,74 @@ export const testData = {
         hoursCount: 2
       }
     ] as UserAssignedHours[]
+  },
+  get emptyServiceWeekData() {
+    return {
+      ...testData.serviceWeeks[0],
+      id: 0,
+      serviceDays: testData.serviceDays.map((serviceDay: any) => ({
+        ...serviceDay,
+        id: 0,
+        serviceHours: testData.serviceHoursWithoutDesignatedUser.map((serviceHour: any) => ({
+          ...serviceHour,
+          id: 0
+        }))
+      }))
+    }
+  },
+  get serviceAvailability() {
+    return {
+      week: testData.serviceWeeks[0].week,
+      serviceDays: testData.serviceDays.map((serviceDay: any) => ({
+        day: serviceDay.day,
+        serviceHours: testData.serviceHoursWithDesignatedUser.map((serviceHour: any) => ({
+          hour: serviceHour.hour,
+          available: [true, false]
+        }))
+      }))
+    }
   }
 }
 
 export const testParams = { service: { week: testTime.week, id: testData.service.id } }
 
-export const testResponses = {
-  service: {
-    ...testData.service,
-    serviceWorkingDays: [...testData.serviceWorkingDays],
-    serviceWeeks: [...testData.serviceWeeks]
-  },
-  showServiceWeek: {
-    ...testData.serviceWeeks[0],
-    serviceDays: [...testData.serviceDays]
-  },
-  editServiceWeek: {
-    ...testData.serviceWeeks[0],
-    serviceDays: testData.serviceDays.map((serviceDay: any) => ({
-      ...serviceDay,
-      serviceHours: testData.serviceHoursDefaultWithUsers
-    }))
-  },
-  userAssignedHours: testData.userAssignedHours
-}
-
 export const testState = {
-  notLoggedIn: { auth: { isLoggedIn: false, user: null } },
-  admin: { auth: { isLoggedIn: true, user: { ...testData.admin } } },
-  user: { auth: { isLoggedIn: true, user: { ...testData.user } } },
-  serviceStore: {
-    service: {
-      ...testData.service,
-      serviceWorkingDays: [...testData.serviceWorkingDays]
-    },
-    activeWeeks: testData.serviceWeeks.map((serviceWeek: any) => serviceWeek.week),
-    userAssignedHours: testData.userAssignedHours
+  notLoggedInAuthStore: { isLoggedIn: false, user: NULL_OBJECTS.USER },
+  adminAuthStore: { isLoggedIn: true, user: { ...testData.admin } },
+  userAuthStore: { isLoggedIn: true, user: { ...testData.user } },
+  get serviceStore() {
+    return {
+      service: {
+        ...testData.service,
+        serviceWorkingDays: [...testData.serviceWorkingDays]
+      },
+      activeWeeks: testData.serviceWeeks.map((serviceWeek: any) => serviceWeek.week),
+      userAssignedHours: testData.userAssignedHours,
+      selectedWeek: testTime.week
+    }
   },
   get showServiceStore() {
     return {
       ...this.serviceStore,
       selectedWeekData: { ...testData.serviceWeeks[0], serviceDays: [...testData.serviceDays] }
+    }
+  },
+  get showServiceStoreWithEmptyServiceWeekData() {
+    return {
+      ...this.serviceStore,
+      selectedWeekData: testData.emptyServiceWeekData
+    }
+  },
+  get showServiceStoreWithoutDesignatedUser() {
+    return {
+      ...this.serviceStore,
+      selectedWeekData: {
+        ...testData.serviceWeeks[0],
+        serviceDays: testData.serviceDays.map((serviceDay: any) => ({
+          ...serviceDay,
+          serviceHours: testData.serviceHoursWithoutDesignatedUser
+        }))
+      }
     }
   },
   get editServiceStore() {
@@ -157,34 +185,15 @@ export const testState = {
         ...testData.serviceWeeks[0],
         serviceDays: testData.serviceDays.map((serviceDay: any) => ({
           ...serviceDay,
-          serviceHours: testData.serviceHoursDefaultWithUsers
+          serviceHours: testData.serviceHoursWithUsers
         }))
       }
-    }
-  },
-  get emptyServiceWeekData() {
-    return {
-      ...testData.serviceWeeks[0],
-      id: 0,
-      serviceDays: testData.serviceDays.map((serviceDay: any) => ({
-        ...serviceDay,
-        id: 0,
-        serviceHours: testData.serviceHoursEmpty
-      }))
     }
   },
   get serviceAvailabilityStore() {
     return {
-      currentAvailability: {
-        week: testData.serviceWeeks[0].week,
-        serviceDays: testData.serviceDays.map((serviceDay: any) => ({
-          ...serviceDay,
-          serviceHours: testData.serviceHoursDefault.map((serviceHour: any) => ({
-            hour: serviceHour.hour,
-            available: [true, false]
-          }))
-        }))
-      }
+      availabilityData: testData.serviceAvailability,
+      changedAvailability: false
     }
   }
 }

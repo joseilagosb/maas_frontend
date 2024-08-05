@@ -1,87 +1,84 @@
-import { describe, it, expect, vi, afterAll, afterEach } from 'vitest'
+import type { ComponentPublicInstance } from 'vue'
+import { type VueWrapper } from '@vue/test-utils'
+import { describe, it, expect, vi, afterAll, beforeEach } from 'vitest'
 import { useRouter } from 'vue-router'
 
 import MainLayout from '@/components/layouts/Main.vue'
 
-import { shallowMountWithPinia } from '@/test/utils'
-import { mockUseRouter } from '@/test/mocks/use_router'
+import { setUseRouterMock, shallowMountWithPinia } from '@/test/utils'
 import { testState } from '@/test/data'
 
-const setUseRouter = (routeName: string) => {
-  vi.mocked(useRouter).mockReturnValue(mockUseRouter(routeName))
-}
-
 describe('MainLayout', () => {
-  afterEach(() => {
-    setUseRouter('home')
-  })
+  let wrapper: VueWrapper<ComponentPublicInstance<typeof MainLayout>>
+  vi.mock('vue-router')
 
   afterAll(() => {
     vi.restoreAllMocks()
   })
 
-  vi.mock('vue-router')
-  setUseRouter('home')
-
   const loginButtonSelector = '[data-testid="login-button"]'
   const welcomeMessageSelector = '[data-testid="welcome-message"]'
 
-  describe('when the user is not logged in', () => {
-    const wrapper = shallowMountWithPinia(MainLayout, {
-      initialState: { ...testState.notLoggedIn }
-    })
-
-    it('shows login button', () => {
-      expect(wrapper.find(loginButtonSelector).text()).toBe('Iniciar sesión')
-    })
-
-    it("doesn't show login button when the route is '/login'", () => {
-      setUseRouter('login')
-      const refreshedWrapper = shallowMountWithPinia(MainLayout, {
-        initialState: { ...testState.notLoggedIn }
+  describe('render', () => {
+    describe('when the user is not logged in', () => {
+      beforeEach(() => {
+        setUseRouterMock('home')
+        wrapper = shallowMountWithPinia(MainLayout, {
+          initialState: { auth: testState.notLoggedInAuthStore }
+        })
       })
 
-      expect(refreshedWrapper.find(loginButtonSelector).exists()).toBe(false)
-    })
-  })
-
-  describe('when the user is logged in', () => {
-    const userDropdownSelector = '[data-testid="user-dropdown"]'
-    const userSelector = '[data-testid="user-selector"]'
-
-    it('shows the username', () => {
-      const updatedWrapper = shallowMountWithPinia(MainLayout, {
-        initialState: { ...testState.user }
-      })
-      expect(updatedWrapper.find(loginButtonSelector).exists()).toBe(false)
-      expect(updatedWrapper.find(welcomeMessageSelector).text()).toBe(testState.user.auth.user.name)
-    })
-
-    it('displays the user dropdown when the user clicks on the user', async () => {
-      const updatedWrapper = shallowMountWithPinia(MainLayout, {
-        initialState: { ...testState.user }
+      it('shows login button', () => {
+        expect(wrapper.find(loginButtonSelector).text()).toBe('Iniciar sesión')
       })
 
-      expect(updatedWrapper.find(userDropdownSelector).exists()).toBe(false)
-      await updatedWrapper.find(userSelector).trigger('click')
-      expect(updatedWrapper.find(userDropdownSelector).exists()).toBe(true)
+      it("doesn't show login button when the route is '/login'", () => {
+        setUseRouterMock('login')
+        wrapper = shallowMountWithPinia(MainLayout, {
+          initialState: { auth: testState.notLoggedInAuthStore }
+        })
+
+        expect(wrapper.find(loginButtonSelector).exists()).toBe(false)
+      })
     })
 
-    it.todo('closes the user dropdown when the user clicks outside of it')
+    describe('when the user is logged in', () => {
+      const userSelector = '[data-testid="user-selector"]'
 
-    it('sends back to login when the user clicks on the logout button', async () => {
-      const updatedWrapper = shallowMountWithPinia(MainLayout, {
-        initialState: { ...testState.user },
-        stubActions: false
+      beforeEach(() => {
+        setUseRouterMock('home')
+        wrapper = shallowMountWithPinia(MainLayout, {
+          initialState: { auth: testState.userAuthStore },
+          stubActions: false
+        })
       })
-      const logoutButtonSelector = '[data-testid="logout-button"]'
 
-      await updatedWrapper.find(userSelector).trigger('click')
-      await updatedWrapper.find(logoutButtonSelector).trigger('click')
+      it('shows the username from the user auth store', () => {
+        const expectedUser = testState.userAuthStore.user
 
-      await updatedWrapper.vm.$nextTick()
+        expect(wrapper.find(loginButtonSelector).exists()).toBe(false)
+        expect(wrapper.find(welcomeMessageSelector).text()).toBe(expectedUser.name)
+      })
 
-      expect(useRouter().push).toHaveBeenCalledWith('/login?redirected=loggedout')
+      it('displays the user dropdown when the user clicks on the user', async () => {
+        const userDropdownSelector = '[data-testid="user-dropdown"]'
+
+        await wrapper.find(userSelector).trigger('click')
+        expect(wrapper.find(userDropdownSelector).exists()).toBe(true)
+      })
+
+      it.todo('closes the user dropdown when the user clicks outside of it')
+
+      it('sends back to login when the user clicks on the logout button', async () => {
+        const logoutButtonSelector = '[data-testid="logout-button"]'
+
+        await wrapper.find(userSelector).trigger('click')
+        await wrapper.find(logoutButtonSelector).trigger('click')
+
+        await wrapper.vm.$nextTick()
+
+        expect(useRouter().push).toHaveBeenCalledWith('/login?redirected=loggedout')
+      })
     })
   })
 })

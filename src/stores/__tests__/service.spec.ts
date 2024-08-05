@@ -69,7 +69,11 @@ describe('Service Store', () => {
         })
 
         it('fetches to api show route', async () => {
-          expect(getServiceWeek).toHaveBeenCalledWith(testData.service.id, testTime.week, 'show')
+          expect(getServiceWeek).toHaveBeenCalledWith(
+            testParams.service.id,
+            testParams.service.week,
+            'show'
+          )
         })
 
         it('fetches the service week', () => {
@@ -85,28 +89,37 @@ describe('Service Store', () => {
         })
 
         it('fetches to api edit route', async () => {
-          expect(getServiceWeek).toHaveBeenCalledWith(testData.service.id, testTime.week, 'edit')
+          expect(getServiceWeek).toHaveBeenCalledWith(
+            testParams.service.id,
+            testParams.service.week,
+            'edit'
+          )
         })
 
         it('fetches the service week', async () => {
+          const { selectedWeekData } = testState.editServiceStore
           expect(serviceStore.selectedWeekData).toBeDefined()
-          expect(serviceStore.selectedWeekData).toEqual(testState.editServiceStore.selectedWeekData)
+          expect(serviceStore.selectedWeekData).toEqual(selectedWeekData)
         })
       })
     })
 
     describe('generateEmptyServiceWeek', () => {
+      beforeEach(() => {
+        serviceStore.$patch({ service: testState.serviceStore.service })
+      })
+
       it('throws error if no service is available', () => {
         serviceStore.$patch({ service: undefined })
         expect(() => serviceStore.generateEmptyServiceWeek()).toThrowError()
       })
 
       it('generates an empty service week', () => {
-        serviceStore.$patch({ service: testState.serviceStore.service })
+        const { selectedWeekData } = testState.showServiceStoreWithEmptyServiceWeekData
         serviceStore.generateEmptyServiceWeek()
 
         expect(serviceStore.selectedWeekData).toBeDefined()
-        expect(serviceStore.selectedWeekData).toEqual(testState.emptyServiceWeekData)
+        expect(serviceStore.selectedWeekData).toEqual(selectedWeekData)
       })
     })
   })

@@ -1,5 +1,5 @@
 import type { ComponentPublicInstance } from 'vue'
-import { describe, it, expect, vi, afterAll, beforeEach, afterEach } from 'vitest'
+import { describe, it, expect, vi, afterAll, beforeEach } from 'vitest'
 import { useRoute, useRouter } from 'vue-router'
 import { flushPromises, VueWrapper } from '@vue/test-utils'
 
@@ -34,7 +34,7 @@ describe('ServiceOverview', () => {
 
     beforeEach(async () => {
       wrapper = shallowMountWithPinia(ServiceOverview, {
-        initialState: { ...testState.user },
+        initialState: { auth: testState.userAuthStore },
         stubActions: false
       })
       await flushPromises()
@@ -79,7 +79,7 @@ describe('ServiceOverview', () => {
             return Promise.reject(new Error('error'))
           })
           const wrapperWithError = shallowMountWithPinia(ServiceOverview, {
-            initialState: { ...testState.user },
+            initialState: { auth: testState.userAuthStore },
             stubActions: false
           })
           await flushPromises()
@@ -98,7 +98,7 @@ describe('ServiceOverview', () => {
             return Promise.reject(new Error('error'))
           })
           const wrapperWithError = shallowMountWithPinia(ServiceOverview, {
-            initialState: { ...testState.user },
+            initialState: { auth: testState.userAuthStore },
             stubActions: false
           })
           await flushPromises()
@@ -113,7 +113,7 @@ describe('ServiceOverview', () => {
     let wrapper: VueWrapper<ComponentPublicInstance<typeof ServiceOverview>>
     beforeEach(async () => {
       wrapper = shallowMountWithPinia(ServiceOverview, {
-        initialState: { ...testState.user },
+        initialState: { auth: testState.userAuthStore },
         stubActions: false
       })
       await flushPromises()
@@ -176,7 +176,7 @@ describe('ServiceOverview', () => {
           .mockImplementationOnce(() => testTime.date.firstDayOfWeek)
           .mockImplementationOnce(() => testTime.date.lastDayOfWeek)
         wrapper = shallowMountWithPinia(ServiceOverview, {
-          initialState: { ...testState.user },
+          initialState: { auth: testState.userAuthStore },
           stubActions: false
         })
         await flushPromises()

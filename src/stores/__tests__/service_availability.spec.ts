@@ -47,9 +47,11 @@ describe('Service Availability Store', () => {
       })
 
       it('generates the availability data', () => {
+        const { availabilityData } = testState.serviceAvailabilityStore
+
         expect(serviceAvailabilityStore.availabilityData).toBeUndefined()
         serviceAvailabilityStore.generateAvailability()
-        expect(serviceAvailabilityStore.availabilityData).toBeDefined()
+        expect(serviceAvailabilityStore.availabilityData).toEqual(availabilityData)
       })
     })
   })

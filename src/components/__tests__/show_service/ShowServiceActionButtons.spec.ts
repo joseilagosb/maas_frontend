@@ -6,35 +6,32 @@ import { createTestingPinia } from '@pinia/testing'
 
 import ShowServiceActionButtons from '@/components/show_service/ShowServiceActionButtons.vue'
 
-import { testData, testState, testTime } from '@/test/data'
+import { testParams, testState } from '@/test/data'
 
 describe('ShowServiceActionButtons', () => {
   vi.mock('vue-router')
-
-  const editServiceWeekButtonSelector = '[data-testid="edit-service-week-button"]'
+  vi.mocked(useRoute).mockReturnValue({ params: testParams.service } as any)
 
   afterAll(() => {
     vi.restoreAllMocks()
   })
 
-  describe('edit my availability button', () => {
-    vi.mocked(useRoute).mockReturnValue({
-      params: { id: testData.service.id, week: testTime.week }
-    } as any)
-
-    const wrapper = shallowMount(ShowServiceActionButtons, {
-      global: {
-        plugins: [
-          createTestingPinia({
-            initialState: { ...testState.user, selectedWeek: testTime.week }
-          })
-        ],
-        stubs: {
-          RouterLink: RouterLinkStub
-        }
+  const wrapper = shallowMount(ShowServiceActionButtons, {
+    global: {
+      plugins: [
+        createTestingPinia({
+          initialState: { auth: testState.userAuthStore, service: testState.showServiceStore }
+        })
+      ],
+      stubs: {
+        RouterLink: RouterLinkStub
       }
-    })
+    }
+  })
 
+  const editServiceWeekButtonSelector = '[data-testid="edit-service-week-button"]'
+
+  describe('edit my availability button', async () => {
     const editServiceWeekButton = wrapper.findComponent(
       editServiceWeekButtonSelector
     ) as VueWrapper<ComponentPublicInstance<RouterLinkProps>>
@@ -50,10 +47,7 @@ describe('ShowServiceActionButtons', () => {
     })
 
     it('links to the correct route', () => {
-      const expectedRoute = {
-        name: 'edit-service-week',
-        params: { id: testData.service.id, week: testTime.week }
-      }
+      const expectedRoute = { name: 'edit-service-week', params: testParams.service }
 
       expect(editServiceWeekButton.props('to')).toEqual(expectedRoute)
     })
