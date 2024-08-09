@@ -48,15 +48,15 @@ export const getServices = async () => {
     })
 }
 
-export const getUserAssignedHours = async (serviceId: number, week: number) => {
+export const getUserHoursAssignments = async (serviceId: number, week: number) => {
   return axios
-    .get(`${API_BASE_URL}/users/assigned_hours`, {
-      params: { user_assigned_hours: { week, service_id: serviceId } }
+    .get(`${API_BASE_URL}/users/hours_assignments`, {
+      params: { hours_assignment: { week, service_id: serviceId } }
     })
     .then(async (response) => {
       const parsedResponseData = response.data
-      const userAssignedHours = await JSONDeserializer.deserialize(parsedResponseData)
-      return userAssignedHours
+      const userHoursAssignments = await JSONDeserializer.deserialize(parsedResponseData)
+      return userHoursAssignments
     })
     .catch((error: Error) => {
       throw error

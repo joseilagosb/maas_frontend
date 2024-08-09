@@ -88,9 +88,9 @@ describe('EditServiceWeekGrid', () => {
         })
       })
 
-      describe('user assigned hours', () => {
+      describe('user hours assignments', () => {
         beforeEach(async () => {
-          serviceStore.$patch({ userAssignedHours: [] })
+          serviceStore.$patch({ userHoursAssignments: [] })
           await flushPromises()
         })
 
@@ -102,7 +102,7 @@ describe('EditServiceWeekGrid', () => {
 
     describe('actions', () => {
       beforeEach(async () => {
-        serviceStore.$patch({ userAssignedHours: [...testData.userAssignedHours] })
+        serviceStore.$patch({ userHoursAssignments: [...testData.userHoursAssignments] })
         await flushPromises()
       })
 
@@ -126,7 +126,7 @@ describe('EditServiceWeekGrid', () => {
             vi.mocked(getServiceWeek).mockImplementationOnce(async () => {
               return Promise.reject(new Error('error'))
             })
-            serviceStore.$patch({ userAssignedHours: [...testData.userAssignedHours] })
+            serviceStore.$patch({ userHoursAssignments: [...testData.userHoursAssignments] })
             await flushPromises()
           })
 
@@ -145,7 +145,7 @@ describe('EditServiceWeekGrid', () => {
           vi.mocked(getServiceWeek).mockImplementationOnce(async () => {
             return Promise.reject(new Error('error'))
           })
-          serviceStore.$patch({ userAssignedHours: [...testData.userAssignedHours] })
+          serviceStore.$patch({ userHoursAssignments: [...testData.userHoursAssignments] })
           await flushPromises()
 
           expect(wrapper.find(errorMessageSelector).exists()).toBe(true)
@@ -161,7 +161,7 @@ describe('EditServiceWeekGrid', () => {
           vi.mocked(getServiceWeek).mockImplementationOnce(async () => {
             return Promise.reject(new Error('error'))
           })
-          serviceStore.$patch({ userAssignedHours: [...testData.userAssignedHours] })
+          serviceStore.$patch({ userHoursAssignments: [...testData.userHoursAssignments] })
           await flushPromises()
 
           expect(wrapper.find(errorMessageSelector).exists()).toBe(true)
@@ -216,7 +216,7 @@ describe('EditServiceWeekGrid', () => {
         it('renders the correct number of columns', () => {
           gridDays.forEach((gridDay) => {
             const gridDayHeaderUsers = gridDay.findAll(gridHeaderUserSelector)
-            expect(gridDayHeaderUsers.length).toEqual(testData.userAssignedHours.length)
+            expect(gridDayHeaderUsers.length).toEqual(testData.userHoursAssignments.length)
           })
         })
 
@@ -224,7 +224,7 @@ describe('EditServiceWeekGrid', () => {
           gridDays.forEach((gridDay) => {
             gridDay.findAll(gridHeaderUserSelector).forEach((gridHeaderUser, index) => {
               expect(gridHeaderUser.classes()).toContain(
-                USER_TAILWIND_COLORS[testData.userAssignedHours[index].color]
+                USER_TAILWIND_COLORS[testData.userHoursAssignments[index].color]
               )
             })
           })
@@ -234,7 +234,7 @@ describe('EditServiceWeekGrid', () => {
           gridDays.forEach((gridDay) => {
             gridDay.findAll(gridHeaderUserSelector).forEach((gridHeaderUser) => {
               expect(gridHeaderUser.attributes()['style']).toEqual(
-                `width: calc(${70 / testData.userAssignedHours.length}%);`
+                `width: calc(${70 / testData.userHoursAssignments.length}%);`
               )
             })
           })
@@ -277,7 +277,7 @@ describe('EditServiceWeekGrid', () => {
           it('renders the correct number of users', () => {
             wrapper.findAll(gridHoursSelector).forEach((gridHour) => {
               const gridHourUsers = gridHour.findAll(gridHourUserSelector)
-              expect(gridHourUsers.length).toEqual(testData.userAssignedHours.length)
+              expect(gridHourUsers.length).toEqual(testData.userHoursAssignments.length)
             })
           })
 
@@ -285,7 +285,7 @@ describe('EditServiceWeekGrid', () => {
             wrapper.findAll(gridHoursSelector).forEach((gridHour) => {
               gridHour.findAll(gridHourUserSelector).forEach((gridHourUser, index) => {
                 expect(gridHourUser.classes()).toContain(
-                  USER_TAILWIND_COLORS[testData.userAssignedHours[index].color]
+                  USER_TAILWIND_COLORS[testData.userHoursAssignments[index].color]
                 )
               })
             })
@@ -315,7 +315,7 @@ describe('EditServiceWeekGrid', () => {
             wrapper.findAll(gridHoursSelector).forEach((gridHour) => {
               gridHour.findAll(gridHourUserSelector).forEach((gridHourUser) => {
                 expect(gridHourUser.attributes().style).toEqual(
-                  `width: calc(${70 / testData.userAssignedHours.length}%);`
+                  `width: calc(${70 / testData.userHoursAssignments.length}%);`
                 )
               })
             })

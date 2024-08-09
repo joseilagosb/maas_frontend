@@ -18,7 +18,7 @@ describe('Service Store', () => {
       serviceStore = useServiceStore(createPinia())
 
       expect(serviceStore.service).toBeUndefined()
-      expect(serviceStore.userAssignedHours).toEqual([])
+      expect(serviceStore.userHoursAssignments).toEqual([])
       expect(serviceStore.activeWeeks).toEqual([])
       expect(serviceStore.selectedWeek).toEqual(testTime.week)
       expect(serviceStore.selectedServiceId).toEqual(testData.service.id)
@@ -58,8 +58,8 @@ describe('Service Store', () => {
       })
     })
 
-    describe('fetchUserAssignedHours', () => {
-      it.todo('fetches the user assigned hours')
+    describe('fetchUserHoursAssignments', () => {
+      it.todo('fetches the user hours assignments')
     })
 
     describe('fetchServiceWeek', () => {

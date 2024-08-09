@@ -17,7 +17,7 @@ export const useServiceAvailabilityStore = defineStore('service_availability', {
         const availabilityData = getAvailabilityData(
           serviceStore.selectedWeek,
           serviceStore.selectedWeekData,
-          serviceStore.userAssignedHours
+          serviceStore.userHoursAssignments
         )
         this.availabilityData = availabilityData
       } catch (error) {

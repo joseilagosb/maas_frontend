@@ -17,9 +17,9 @@ const authStore = useAuthStore()
 const serviceStore = useServiceStore()
 const serviceAvailabilityStore = useServiceAvailabilityStore()
 const { availabilityData } = storeToRefs(serviceAvailabilityStore)
-const { userAssignedHours, weekContainsData, selectedWeek, selectedWeekData, dayOfServiceWeek } = storeToRefs(serviceStore)
+const { userHoursAssignments, weekContainsData, selectedWeek, selectedWeekData, dayOfServiceWeek } = storeToRefs(serviceStore)
 
-watch([userAssignedHours, selectedWeek], () => {
+watch([userHoursAssignments, selectedWeek], () => {
   loading.value = true
   isErrorVisible.value = false
 
@@ -56,7 +56,7 @@ watch([userAssignedHours, selectedWeek], () => {
       <div class="flex flex-row w-full" data-testid="grid-header">
         <div class="w-[30%] mt-[40px]"></div>
         <div class="text-center mt-[40px]" :class="[`${USER_TAILWIND_COLORS[user.color]}`]"
-          :style="[`width: calc(${70 / userAssignedHours.length}%)`]" v-for="user in userAssignedHours"
+          :style="[`width: calc(${70 / userHoursAssignments.length}%)`]" v-for="user in userHoursAssignments"
           data-testid="grid-header-user">
           <span class="text-sm font-bold">{{ user.name }}</span>
         </div>
@@ -67,9 +67,10 @@ watch([userAssignedHours, selectedWeek], () => {
           <span class="text-sm text-light" data-testid="grid-hour-time">{{ getFormattedHour(hour) }}-{{
             getFormattedHour(hour + 1) }}</span>
         </div>
-        <div v-for="(user, userIndex) in userAssignedHours" :key="user.id" class="text-center"
-          :class="[`${USER_TAILWIND_COLORS[user.color]}`]" :style="[`width: calc(${70 / userAssignedHours.length}%)`]"
-          data-testid="grid-hour-user" :data-testhourindex="hourIndex" :data-testuserid="user.id">
+        <div v-for="(user, userIndex) in userHoursAssignments" :key="user.id" class="text-center"
+          :class="[`${USER_TAILWIND_COLORS[user.color]}`]"
+          :style="[`width: calc(${70 / userHoursAssignments.length}%)`]" data-testid="grid-hour-user"
+          :data-testhourindex="hourIndex" :data-testuserid="user.id">
           <input class="rounded size-5" type="checkbox"
             v-model="availabilityData!.serviceDays[dayIndex].serviceHours[hourIndex].available[userIndex]"
             @change="serviceAvailabilityStore.changedAvailability = true" :disabled="+user.id !== authStore.user.id"

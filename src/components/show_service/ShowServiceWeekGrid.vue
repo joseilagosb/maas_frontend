@@ -13,9 +13,9 @@ const isErrorVisible = ref(false)
 
 const serviceStore = useServiceStore()
 
-const { userAssignedHours, dayOfServiceWeek, selectedWeekData, weekContainsData, selectedWeek } = storeToRefs(serviceStore)
+const { userHoursAssignments, dayOfServiceWeek, selectedWeekData, weekContainsData, selectedWeek } = storeToRefs(serviceStore)
 
-watch([userAssignedHours, selectedWeek], () => {
+watch([userHoursAssignments, selectedWeek], () => {
   loading.value = true
   isErrorVisible.value = false
 
@@ -61,7 +61,7 @@ watch([userAssignedHours, selectedWeek], () => {
         <div class="w-[60%] flex items-center justify-center">
           <span class="text-sm font-bold" data-testid="grid-hour-designated-user">{{
             designatedUser ? designatedUser.name : 'Sin asignar'
-          }}</span>
+            }}</span>
         </div>
       </div>
     </div>

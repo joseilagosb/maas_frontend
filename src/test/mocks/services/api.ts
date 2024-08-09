@@ -29,5 +29,5 @@ export const mockAPIService = {
         })
     }
   },
-  getUserAssignedHours: () => Promise.resolve(testData.userAssignedHours)
+  getUserHoursAssignments: () => Promise.resolve(testData.userHoursAssignments)
 }

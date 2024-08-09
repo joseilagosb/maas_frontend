@@ -1,4 +1,4 @@
-import type { ServiceHour, User, UserAssignedHours } from '@/types/models'
+import type { ServiceHour, User, UserHoursAssignment } from '@/types/models'
 import { getArrayFromInterval } from '@/utils/common'
 import { NULL_OBJECTS } from '@/utils/constants'
 
@@ -93,7 +93,7 @@ export const testData = {
   get users(): User[] {
     return [testData.user, testData.notDesignatedUser]
   },
-  get userAssignedHours(): UserAssignedHours[] {
+  get userHoursAssignments(): UserHoursAssignment[] {
     return [
       {
         id: testData.users[0].id,
@@ -107,7 +107,7 @@ export const testData = {
         color: testData.users[1].color,
         hoursCount: 2
       }
-    ] as UserAssignedHours[]
+    ] as UserHoursAssignment[]
   },
   get emptyServiceWeekData() {
     return {
@@ -150,7 +150,7 @@ export const testState = {
         serviceWorkingDays: [...testData.serviceWorkingDays]
       },
       activeWeeks: testData.serviceWeeks.map((serviceWeek: any) => serviceWeek.week),
-      userAssignedHours: testData.userAssignedHours,
+      userHoursAssignments: testData.userHoursAssignments,
       selectedWeek: testTime.week
     }
   },

@@ -83,9 +83,9 @@ describe('ShowServiceWeekGrid', () => {
         })
       })
 
-      describe('user assigned hours', () => {
+      describe('user hours assignments', () => {
         beforeEach(async () => {
-          serviceStore.$patch({ userAssignedHours: [] })
+          serviceStore.$patch({ userHoursAssignments: [] })
           await flushPromises()
         })
 
@@ -98,7 +98,7 @@ describe('ShowServiceWeekGrid', () => {
     describe('actions', () => {
       describe('fetchServiceWeek', () => {
         it('renders the grid if it succeeds', async () => {
-          serviceStore.$patch({ userAssignedHours: [...testData.userAssignedHours] })
+          serviceStore.$patch({ userHoursAssignments: [...testData.userHoursAssignments] })
           await flushPromises()
           expect(wrapper.find(gridSelector).exists()).toBe(true)
         })
@@ -107,7 +107,7 @@ describe('ShowServiceWeekGrid', () => {
           vi.mocked(getServiceWeek).mockImplementationOnce(async () => {
             return Promise.reject(new Error('error'))
           })
-          serviceStore.$patch({ userAssignedHours: [...testData.userAssignedHours] })
+          serviceStore.$patch({ userHoursAssignments: [...testData.userHoursAssignments] })
           await flushPromises()
 
           expect(wrapper.find(errorMessageSelector).exists()).toBe(true)
@@ -116,7 +116,7 @@ describe('ShowServiceWeekGrid', () => {
 
       describe('generateEmptyServiceWeek', () => {
         it('renders the grid if it succeeds', async () => {
-          serviceStore.$patch({ userAssignedHours: [...testData.userAssignedHours] })
+          serviceStore.$patch({ userHoursAssignments: [...testData.userHoursAssignments] })
           await flushPromises()
           expect(wrapper.find(gridSelector).exists()).toBe(true)
         })
@@ -125,7 +125,7 @@ describe('ShowServiceWeekGrid', () => {
           vi.mocked(getServiceWeek).mockImplementationOnce(async () => {
             return Promise.reject(new Error('error'))
           })
-          serviceStore.$patch({ userAssignedHours: [...testData.userAssignedHours] })
+          serviceStore.$patch({ userHoursAssignments: [...testData.userHoursAssignments] })
           await flushPromises()
 
           expect(wrapper.find(errorMessageSelector).exists()).toBe(true)

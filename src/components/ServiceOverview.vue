@@ -18,7 +18,7 @@ const loading = ref(true)
 const isErrorVisible = ref(false)
 
 const serviceStore = useServiceStore()
-const { service, userAssignedHours, dayOfServiceWeek, selectedWeek, activeWeeks, weekContainsData } = storeToRefs(serviceStore)
+const { service, userHoursAssignments, dayOfServiceWeek, selectedWeek, activeWeeks, weekContainsData } = storeToRefs(serviceStore)
 
 const weekOptions = computed(() => {
   const currentWeek = getWeek()
@@ -38,7 +38,7 @@ const onChangeWeek = () => {
 }
 
 watch([service, selectedWeek], () => {
-  serviceStore.fetchUserAssignedHours()
+  serviceStore.fetchUserHoursAssignments()
     .catch(() => { isErrorVisible.value = true })
     .finally(() => { loading.value = false })
 })
@@ -87,12 +87,12 @@ onMounted(() => {
           <span>Horas asignadas</span>
         </h3>
         <div class="border border-black rounded-xl py-1 flex flex-col gap-1 overflow-hidden">
-          <div v-if="!weekContainsData" class="px-4 py-4 text-center" data-testid="empty-week-message">
+          <div v-if="!weekContainsData" class="px-4 py-4 text-center" data-testid="no-user-hours-assignments-message">
             <span class="font-light text-3xl">Todavía no se han asignado usuarios para esta semana.</span>
           </div>
           <div v-else class="h-[40px] w-full px-4 flex items-center justify-between"
-            :class="[`${USER_TAILWIND_COLORS[user.color]}`]" v-for="user in userAssignedHours" :key="user.id"
-            data-testid="user-assigned-hours">
+            :class="[`${USER_TAILWIND_COLORS[user.color]}`]" v-for="user in userHoursAssignments" :key="user.id"
+            data-testid="user-hours-assignments">
             <span class="font-light text-lg">{{ user.name }}</span>
             <span class="font-light text-lg">{{ user.hoursCount }}</span>
           </div>

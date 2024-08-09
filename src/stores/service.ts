@@ -3,7 +3,7 @@ import { useRoute } from 'vue-router'
 
 import { getWeek, nthDayOfWeek } from '@/services/date'
 
-import { getService, getServiceWeek, getUserAssignedHours } from '@/services/api'
+import { getService, getServiceWeek, getUserHoursAssignments } from '@/services/api'
 import { getEmptyServiceWeekData } from './utils/service'
 
 import type { ServiceState } from '@/types/stores'
@@ -15,7 +15,7 @@ const getDefaultServiceState = (): ServiceState => {
   const selectedServiceId = +route.params.id!
   return {
     service: undefined,
-    userAssignedHours: [],
+    userHoursAssignments: [],
     activeWeeks: [],
     selectedServiceId,
     selectedWeek,
@@ -55,19 +55,21 @@ export const useServiceStore = defineStore('service', {
           active: service.active,
           serviceWorkingDays: service.serviceWorkingDays
         } as Service
-        const activeWeeks = service.serviceWeeks.map((serviceWeek: ServiceWeek) => +serviceWeek.week)
+        const activeWeeks = service.serviceWeeks.map(
+          (serviceWeek: ServiceWeek) => +serviceWeek.week
+        )
         this.activeWeeks = activeWeeks
       } catch (error) {
         throw error
       }
     },
-    async fetchUserAssignedHours() {
+    async fetchUserHoursAssignments() {
       try {
-        const userAssignedHours = await getUserAssignedHours(
+        const userHoursAssignments = await getUserHoursAssignments(
           this.selectedServiceId,
           this.selectedWeek
         )
-        this.userAssignedHours = userAssignedHours
+        this.userHoursAssignments = userHoursAssignments
       } catch (error) {
         throw error
       }

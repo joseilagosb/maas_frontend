@@ -7,7 +7,7 @@ import ServiceOverview from '../ServiceOverview.vue'
 
 import { useServiceStore } from '@/stores/service'
 
-import { getService, getUserAssignedHours } from '@/services/api'
+import { getService, getUserHoursAssignments } from '@/services/api'
 import { formatDate } from '@/services/date'
 
 import { testData, testParams, testState, testTime } from '@/test/data'
@@ -54,16 +54,16 @@ describe('ServiceOverview', () => {
       })
 
       describe('selected week', async () => {
-        it('runs the fetchUserAssignedHours action', () => {
+        it('runs the fetchUserHoursAssignments action', () => {
           serviceStore.$patch({ selectedWeek: testTime.week - 1 })
-          expect(serviceStore.fetchUserAssignedHours).toHaveBeenCalledTimes(1)
+          expect(serviceStore.fetchUserHoursAssignments).toHaveBeenCalledTimes(1)
         })
       })
 
       describe('service', () => {
-        it('runs the fetchUserAssignedHours action', () => {
+        it('runs the fetchUserHoursAssignments action', () => {
           serviceStore.$patch({ service: undefined })
-          expect(serviceStore.fetchUserAssignedHours).toHaveBeenCalledTimes(1)
+          expect(serviceStore.fetchUserHoursAssignments).toHaveBeenCalledTimes(1)
         })
       })
     })
@@ -88,13 +88,13 @@ describe('ServiceOverview', () => {
         })
       })
 
-      describe('user assigned hours fetch', () => {
+      describe('user hours assignments fetch', () => {
         it('renders service if it succeeds', async () => {
           expect(wrapper.find(serviceSelector).exists()).toBe(true)
         })
 
         it('renders error if it fails', async () => {
-          vi.mocked(getUserAssignedHours).mockImplementationOnce(async () => {
+          vi.mocked(getUserHoursAssignments).mockImplementationOnce(async () => {
             return Promise.reject(new Error('error'))
           })
           const wrapperWithError = shallowMountWithPinia(ServiceOverview, {
@@ -202,7 +202,8 @@ describe('ServiceOverview', () => {
     })
 
     describe('assigned hours count', () => {
-      const emptyWeekMessageSelector = '[data-testid="empty-week-message"]'
+      const noUserHoursAssignmentsMessageSelector =
+        '[data-testid="no-user-hours-assignments-message"]'
       const unassignedHoursMessageSelector = '[data-testid="unassigned-hours-message"]'
 
       describe('week doesnt contain data', () => {
@@ -216,8 +217,8 @@ describe('ServiceOverview', () => {
           await wrapper.vm.$nextTick()
         })
 
-        it('shows empty week message if week doesnt contain data', async () => {
-          expect(wrapper.find(emptyWeekMessageSelector).exists()).toBe(true)
+        it('shows no user hours assignments message if week doesnt contain data', async () => {
+          expect(wrapper.find(noUserHoursAssignmentsMessageSelector).exists()).toBe(true)
         })
 
         it('shows the correct text in the unassigned hours count', () => {
@@ -226,31 +227,35 @@ describe('ServiceOverview', () => {
       })
 
       describe('week contains data', () => {
-        const userAssignedHoursSelector = '[data-testid="user-assigned-hours"]'
+        const userHoursAssignmentsSelector = '[data-testid="user-hours-assignments"]'
 
         it('renders the correct users count', () => {
-          expect(wrapper.findAll(userAssignedHoursSelector).length).toBe(
-            testData.userAssignedHours.length
+          expect(wrapper.findAll(userHoursAssignmentsSelector).length).toBe(
+            testData.userHoursAssignments.length
           )
         })
 
         it('renders the correct user colors', () => {
-          const userAssignedHours = wrapper.findAll(userAssignedHoursSelector)
-          expect(userAssignedHours.length).toBe(testData.userAssignedHours.length)
-          userAssignedHours.forEach((userAssignedHour, userIndex) => {
-            expect(userAssignedHour.classes()).toContain(
-              USER_TAILWIND_COLORS[testData.userAssignedHours[userIndex].color]
+          const userHoursAssignments = wrapper.findAll(userHoursAssignmentsSelector)
+          expect(userHoursAssignments.length).toBe(testData.userHoursAssignments.length)
+          userHoursAssignments.forEach((userHoursAssignment, userIndex) => {
+            expect(userHoursAssignment.classes()).toContain(
+              USER_TAILWIND_COLORS[testData.userHoursAssignments[userIndex].color]
             )
           })
         })
 
         it('renders the correct name and count', () => {
-          wrapper.findAll(userAssignedHoursSelector).forEach((userAssignedHour, userIndex) => {
-            expect(userAssignedHour.text()).toContain(testData.userAssignedHours[userIndex].name)
-            expect(userAssignedHour.text()).toContain(
-              testData.userAssignedHours[userIndex].hoursCount
-            )
-          })
+          wrapper
+            .findAll(userHoursAssignmentsSelector)
+            .forEach((userHoursAssignment, userIndex) => {
+              expect(userHoursAssignment.text()).toContain(
+                testData.userHoursAssignments[userIndex].name
+              )
+              expect(userHoursAssignment.text()).toContain(
+                testData.userHoursAssignments[userIndex].hoursCount
+              )
+            })
         })
 
         it('shows the correct text in the unassigned hours count', () => {
