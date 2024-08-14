@@ -6,6 +6,7 @@ import { useServiceAvailabilityStore } from '../service_availability'
 import { useServiceStore } from '../service'
 
 import { testParams, testState } from '@/test/data'
+import { putAvailability } from '@/services/api'
 
 describe('Service Availability Store', () => {
   vi.mock('vue-router')
@@ -52,6 +53,17 @@ describe('Service Availability Store', () => {
         expect(serviceAvailabilityStore.availabilityData).toBeUndefined()
         serviceAvailabilityStore.generateAvailability()
         expect(serviceAvailabilityStore.availabilityData).toEqual(availabilityData)
+      })
+    })
+
+    describe('submitAvailability', () => {
+      it('fetches to api put route', async () => {
+        await serviceAvailabilityStore.submitAvailability()
+        expect(putAvailability).toHaveBeenCalledWith(
+          testParams.service.id,
+          testParams.service.week,
+          serviceAvailabilityStore.availabilityData
+        )
       })
     })
   })

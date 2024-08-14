@@ -1,6 +1,7 @@
 import axios from 'axios'
 import { JSONDeserializer } from './deserializer'
 import { API_BASE_URL, NULL_OBJECTS, USER_LOCAL_STORAGE_KEYS } from '@/utils/constants'
+import type { Availability } from '@/types/models'
 
 export const postLogin = async (email: string, password: string) => {
   return axios
@@ -89,6 +90,23 @@ export const getServiceWeek = async (id: number, week: number, mode: 'show' | 'e
       const parsedResponseData = response.data
       const selectedWeekData = await JSONDeserializer.deserialize(parsedResponseData)
       return selectedWeekData
+    })
+    .catch((error: Error) => {
+      throw error
+    })
+}
+
+export const putAvailability = async (id: number, week: number, availabilityData: Availability) => {
+  return axios
+    .put(
+      `${API_BASE_URL}/services/${id}/service_weeks/${week}`,
+      { service_week: { availability: JSON.stringify(availabilityData) } },
+      { headers: { 'Content-Type': 'application/json', Accept: 'application/json' } }
+    )
+    .then((response) => {
+      if (response && response.data) {
+        return response.data
+      }
     })
     .catch((error: Error) => {
       throw error

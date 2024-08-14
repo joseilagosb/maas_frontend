@@ -25,7 +25,8 @@ describe('EditServiceActionButtons', () => {
     global: {
       plugins: [
         createTestingPinia({
-          initialState: { user: testState.userAuthStore, service: testState.editServiceStore }
+          initialState: { user: testState.userAuthStore, service: testState.editServiceStore },
+          stubActions: false
         })
       ],
       stubs: {
@@ -68,6 +69,17 @@ describe('EditServiceActionButtons', () => {
       await wrapper.vm.$nextTick()
 
       expect(saveButton.attributes().disabled).toBeUndefined()
+    })
+
+    it('calls the submit availability action when clicked', async () => {
+      const serviceAvailabilityStore = useServiceAvailabilityStore()
+      serviceAvailabilityStore.$patch({ changedAvailability: true })
+      await wrapper.vm.$nextTick()
+
+      saveButton.trigger('click')
+      await wrapper.vm.$nextTick()
+
+      expect(serviceAvailabilityStore.submitAvailability).toHaveBeenCalledTimes(1)
     })
   })
 })

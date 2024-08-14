@@ -1,6 +1,8 @@
 import { defineStore } from 'pinia'
 import { useServiceStore } from './service'
 
+import { putAvailability } from '@/services/api'
+
 import { getAvailabilityData } from './utils/service_availability'
 
 import type { ServiceAvailabilityState } from '@/types/stores'
@@ -20,6 +22,18 @@ export const useServiceAvailabilityStore = defineStore('service_availability', {
           serviceStore.userHoursAssignments
         )
         this.availabilityData = availabilityData
+      } catch (error) {
+        throw error
+      }
+    },
+    async submitAvailability() {
+      const serviceStore = useServiceStore()
+      try {
+        await putAvailability(
+          serviceStore.selectedServiceId,
+          serviceStore.selectedWeek,
+          this.availabilityData!
+        )
       } catch (error) {
         throw error
       }
