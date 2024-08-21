@@ -128,9 +128,12 @@ export const testData = {
       week: testData.serviceWeeks[0].week,
       serviceDays: testData.serviceDays.map((serviceDay: any) => ({
         day: serviceDay.day,
-        serviceHours: testData.serviceHoursWithDesignatedUser.map((serviceHour: any) => ({
+        serviceHours: testData.serviceHoursWithUsers.map((serviceHour: any) => ({
           hour: serviceHour.hour,
-          available: [true, false]
+          available: testData.users.reduce(
+            (acc, user) => ({ ...acc, [user.id]: serviceHour.users.includes(user) }),
+            {}
+          )
         }))
       }))
     }

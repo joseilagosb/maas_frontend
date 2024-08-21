@@ -28,4 +28,18 @@ axios.interceptors.request.use(
   }
 )
 
+axios.interceptors.response.use(
+  function (response) {
+    return Promise.resolve(response)
+  },
+  function (error) {
+    if (error.response.status === 401) {
+      localStorage.removeItem(USER_LOCAL_STORAGE_KEYS.TOKEN)
+      localStorage.removeItem(USER_LOCAL_STORAGE_KEYS.USER)
+      router.push('/login')
+    }
+    return Promise.reject(error)
+  }
+)
+
 app.mount('#app')

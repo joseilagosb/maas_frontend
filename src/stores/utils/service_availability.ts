@@ -33,11 +33,20 @@ export const getAvailabilityData = (
       const serviceDayHours = serviceDay.serviceHours.map((serviceHour: ServiceHour) => {
         let availableArr
         if (serviceHour.users) {
-          availableArr = userHoursAssignments.map((user: UserHoursAssignment) =>
-            serviceHour.users!.some((availableUser: User) => availableUser.id === user.id)
+          availableArr = userHoursAssignments.reduce(
+            (acc, curr) => ({
+              ...acc,
+              [curr.id]: serviceHour.users!.some(
+                (availableUser: User) => availableUser.id === curr.id
+              )
+            }),
+            {}
           )
         } else {
-          availableArr = Array(userHoursAssignments.length).fill(false)
+          availableArr = userHoursAssignments.reduce(
+            (acc, curr) => ({ ...acc, [curr.id]: false }),
+            {}
+          )
         }
 
         return {

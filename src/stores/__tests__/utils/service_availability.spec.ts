@@ -98,8 +98,8 @@ describe('Service Availability Utils', () => {
 
       it('has the correct amount of available users', () => {
         forEveryAvailabilityHour(availabilityData, expectedAvailabilityData, (result, expected) => {
-          expect(result.available.length).toEqual(userHoursAssignments.length)
-          expect(result.available.length).toEqual(expected.available.length)
+          expect(Object.keys(result.available).length).toEqual(userHoursAssignments.length)
+          expect(Object.keys(result.available).length).toBe(Object.keys(expected.available).length)
         })
       })
 

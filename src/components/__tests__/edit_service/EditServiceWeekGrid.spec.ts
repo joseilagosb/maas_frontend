@@ -329,13 +329,17 @@ describe('EditServiceWeekGrid', () => {
                 expectedAvailability.serviceHours[+gridHourIndex].available
 
               const gridHourUsers = gridHour.findAll(gridHourUserSelector)
-              const hourCheckboxValues = gridHourUsers.reduce<boolean[]>((acc, gridHourUser) => {
-                const gridHourUserCheckbox: DOMWrapper<HTMLInputElement> = gridHourUser.find(
-                  gridHourUserCheckboxSelector
-                )
-                acc.push(gridHourUserCheckbox.element.checked)
-                return acc
-              }, [])
+              const hourCheckboxValues = gridHourUsers.reduce<Record<string, boolean>>(
+                (acc, gridHourUser) => {
+                  const userId = gridHourUser.attributes()['data-testuserid']
+                  const gridHourUserCheckbox: DOMWrapper<HTMLInputElement> = gridHourUser.find(
+                    gridHourUserCheckboxSelector
+                  )
+                  acc[userId] = gridHourUserCheckbox.element.checked
+                  return acc
+                },
+                {}
+              )
               expect(hourCheckboxValues).toEqual(expectedCheckboxValues)
             })
           })

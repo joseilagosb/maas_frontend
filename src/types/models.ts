@@ -55,5 +55,5 @@ export type AvailabilityDay = {
 }
 export type AvailabilityHour = {
   hour: number
-  available: boolean[]
+  available: { [key: number]: boolean }
 }
