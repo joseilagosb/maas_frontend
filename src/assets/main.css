@@ -2,6 +2,96 @@
 @tailwind components;
 @tailwind utilities;
 
+@layer base {
+  @font-face {
+    font-family: "Open Sans Light";
+    font-style: normal;
+    font-weight: 300;
+    font-display: block;
+    src: url("@/assets/fonts/OpenSans/OpenSans-Light.ttf");
+  }
+  
+  @font-face {
+    font-family: "OpenSans_Regular";
+    font-style: normal;
+    font-weight: 400;
+    font-display: block;
+    src: url("@/assets/fonts/OpenSans/OpenSans-Regular.ttf");
+  }
+  
+  @font-face {
+    font-family: "Open Sans Medium";
+    font-style: normal;
+    font-weight: 500;
+    font-display: block;
+    src: url("@/assets/fonts/OpenSans/OpenSans-Medium.ttf");
+  }
+  
+  @font-face {
+    font-family: "Open Sans Semi Bold";
+    font-style: normal;
+    font-weight: 600;
+    font-display: block;
+    src: url("@/assets/fonts/OpenSans/OpenSans-SemiBold.ttf");
+  }
+  
+  @font-face {
+    font-family: "Open Sans Bold";
+    font-style: normal;
+    font-weight: 700;
+    font-display: block;
+    src: url("@/assets/fonts/OpenSans/OpenSans-Bold.ttf");
+  }
+  
+  @font-face {
+    font-family: "Open Sans Extra Bold";
+    font-style: normal;
+    font-weight: 800;
+    font-display: block;
+    src: url("@/assets/fonts/OpenSans/OpenSans-ExtraBold.ttf");
+  }
+  
+  @font-face {
+    font-family: "Open Sans Condensed Regular";
+    font-style: normal;
+    font-weight: 400;
+    font-display: block;
+    src: url("@/assets/fonts/OpenSans_Condensed/OpenSans_Condensed-Regular.ttf");
+  }
+  
+  @font-face {
+    font-family: "Open Sans Condensed Medium";
+    font-style: normal;
+    font-weight: 500;
+    font-display: block;
+    src: url("@/assets/fonts/OpenSans_Condensed/OpenSans_Condensed-Medium.ttf");
+  }
+  
+  @font-face {
+    font-family: "Open Sans Condensed Semi Bold";
+    font-style: normal;
+    font-weight: 600;
+    font-display: block;
+    src: url("@/assets/fonts/OpenSans_Condensed/OpenSans_Condensed-SemiBold.ttf");
+  }
+  
+  @font-face {
+    font-family: "Open Sans Condensed Bold";
+    font-style: normal;
+    font-weight: 700;
+    font-display: block;
+    src: url("@/assets/fonts/OpenSans_Condensed/OpenSans_Condensed-Bold.ttf");
+  }
+  
+  @font-face {
+    font-family: "Open Sans Condensed Extra Bold";
+    font-style: normal;
+    font-weight: 800;
+    font-display: block;
+    src: url("@/assets/fonts/OpenSans_Condensed/OpenSans_Condensed-ExtraBold.ttf");
+  }
+}
+
 body {
   width: 100%;
   height: 100%;
@@ -11,6 +101,7 @@ body {
 *::before,
 *::after {
   box-sizing: border-box;
+  font-family: 'Open Sans Regular', sans-serif;
 }
 
 @layer utilities {

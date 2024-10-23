@@ -14,16 +14,15 @@ const slots = useSlots()
   <div class="w-full h-[calc(100vh-60px)] flex flex-col gap-4 items-center justify-center pt-4 px-2">
     <nav class="flex justify-between items-left gap-4 w-full">
       <div class="flex flex-row items-center gap-4">
-        <RouterLink to="/services"
-          class="flex items-center gap-4 cursor-pointer px-4 py-2 bg-orange-500 rounded-lg text-white">
+        <RouterLink to="/services" class="flex items-center gap-4 cursor-pointer px-6 py-4 bg-orange-500 text-white">
           <FontAwesomeIcon :icon="faPersonBooth" class="text-md" />
-          <span class="text-md font-medium">Servicios</span>
+          <span class="text-2xl font-condensed-medium uppercase">Servicios</span>
         </RouterLink>
         <RouterLink to="/companies" v-if="authStore.isAdmin"
-          class="flex items-center gap-4 cursor-pointer px-4 py-2 bg-orange-500 rounded-lg text-white"
+          class="flex items-center gap-4 cursor-pointer px-6 py-4 bg-orange-500 text-white"
           data-testid="companies-button">
           <FontAwesomeIcon :icon="faBuilding" class="text-md" />
-          <span class="text-md font-medium">Empresas</span>
+          <span class="text-2xl font-condensed-medium uppercase">Empresas</span>
         </RouterLink>
       </div>
       <slot name="action-buttons"></slot>

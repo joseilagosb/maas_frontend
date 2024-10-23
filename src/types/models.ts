@@ -11,6 +11,7 @@ export type User = {
 export type Service = {
   id: number
   name: string
+  description: string
   active: boolean
   serviceWorkingDays: ServiceWorkingDay[]
 }
