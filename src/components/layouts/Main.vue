@@ -55,17 +55,19 @@ const onClickLogout = () => {
           <FontAwesomeIcon :icon="faChevronDown"
             :class="{ 'transform rotate-180 duration-300': isUserMenuDropdownOpen }" class="text-lg text-white" />
         </div>
-        <div v-if="isUserMenuDropdownOpen"
-          class="absolute right-0 max-w-[300px] -bottom-[80px] p-2 flex flex-col gap-2 bg-orange-200 rounded-xl"
-          data-testid="user-dropdown">
-          <div class="flex items-center justify-end gap-2">
-            <FontAwesomeIcon :icon="faEnvelope" class="text-md" />
-            <span class="text-md font-medium">{{ authStore.user.email }}</span>
-          </div>
-          <div class="flex items-center justify-end gap-2 text-right cursor-pointer" @click="onClickLogout"
-            data-testid="logout-button">
-            <FontAwesomeIcon :icon="faRightFromBracket" class="text-md" />
-            <span class="text-md font-medium">Cerrar sesión</span>
+        <div class="absolute right-0 w-[300px] top-[40px] overflow-hidden">
+          <div :class="{ 'translate-y-0': isUserMenuDropdownOpen, '-translate-y-32': !isUserMenuDropdownOpen }"
+            class="float-right max-w-[200px] p-2 flex flex-col gap-1 bg-orange-600 transition-transform duration-300"
+            data-testid="user-dropdown">
+            <div class="flex items-center justify-end gap-2">
+              <FontAwesomeIcon :icon="faEnvelope" class="text-lg text-white" />
+              <span class="text-xl text-white font-condensed-medium">{{ authStore.user.email }}</span>
+            </div>
+            <div class="flex items-center justify-end gap-2 text-right cursor-pointer" @click="onClickLogout"
+              data-testid="logout-button">
+              <FontAwesomeIcon :icon="faRightFromBracket" class="text-lg text-white" />
+              <span class="text-xl text-white font-condensed-medium">Cerrar sesión</span>
+            </div>
           </div>
         </div>
       </div>

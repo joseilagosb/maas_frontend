@@ -1,9 +1,11 @@
 <script setup lang="ts">
-import { ref, onMounted, computed } from 'vue';
-import { useHomeStore } from '@/stores/home';
-import { generateRandomNumbers } from '@/utils/common';
+import { ref, onMounted } from 'vue';
 import { faChevronRight } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
+
+import { useHomeStore } from '@/stores/home';
+
+import { generateRandomNumbers } from '@/utils/common';
 
 const homeStore = useHomeStore()
 const loading = ref(true)
@@ -42,16 +44,22 @@ onMounted(() => {
   </div>
   <div v-else class="grid grid-cols-1 md:grid-cols-2 gap-4" data-testid="services">
     <div v-for="service in homeStore.services" :key="service.id"
-      class="flex flex-col rounded-lg bg-orange-300 shadow-xl md:flex-row" data-testid="service">
-      <img class="h-48 w-full rounded-t-lg object-cover md:h-auto md:w-48 md:!rounded-none md:!rounded-s-lg"
-        :src="getImageUrl(service.id)" alt="service preview" />
-      <div class="flex flex-col justify-start p-6">
-        <h5 class="mb-2 text-xl font-medium">{{ service.name }}</h5>
-        <p class="mb-4 text-base"> {{ service.description }} </p>
+      class="group/card flex flex-col rounded-lg bg-orange-300 shadow-xl md:flex-row" data-testid="service">
+      <div class="h-48 md:h-auto min-w-full md:min-w-48 md:w-48 overflow-hidden">
+        <img
+          class="rounded-t-lg size-full object-cover md:!rounded-none md:!rounded-s-lg group-hover/card:scale-105 transition-transform duration-300"
+          :src="getImageUrl(service.id)" alt="service preview" />
+      </div>
+      <div class="flex flex-col p-6 justify-between">
+        <div>
+          <h5 class="mb-2 text-4xl font-condensed-bold">{{ service.name }}</h5>
+          <p class="mb-4 text-lg font-regular"> {{ service.description }} </p>
+        </div>
         <RouterLink :to="`/services/${service.id}`"
-          class="group self-end flex items-center justify-end p-4 gap-2 bg-orange-400 text-black hover:bg-orange-500">
-          <span class="text-sm text-white group-hover:text-black font-medium">Ver turnos</span>
-          <FontAwesomeIcon :icon="faChevronRight" class="text-2xl text-white group-hover:text-black" />
+          class="group/button self-end flex items-center justify-end p-4 gap-2 transition-colors duration-300 bg-orange-400 text-black hover:bg-orange-500">
+          <span class="text-lg text-white group-hover/button:text-black font-condensed-medium uppercase">Ver
+            turnos</span>
+          <FontAwesomeIcon :icon="faChevronRight" class="text-2xl text-white group-hover/button:text-black" />
         </RouterLink>
       </div>
     </div>
