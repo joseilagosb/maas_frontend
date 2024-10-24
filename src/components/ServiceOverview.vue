@@ -97,7 +97,7 @@ onMounted(() => {
           </div>
           <p class="text-center text-lg text-gray-400" data-testid="unassigned-hours-message">{{
             "X"
-            }}
+          }}
             horas
             {{
               weekContainsData ? "sin asignar" :

@@ -35,15 +35,22 @@ const submitAvailability = () => {
 
 <template>
   <RouterLink :to="{ name: 'show-service-week' }"
-    class="flex items-center gap-4 cursor-pointer px-4 py-2 bg-orange-400 rounded-lg text-white"
+    class="group flex items-center gap-3 cursor-pointer px-4 py-3 bg-orange-400 hover:bg-orange-500 transition-colors duration-300"
     data-testid="discard-changes-button">
-    <FontAwesomeIcon :icon="faArrowLeft" class="text-md" />
-    <span class="text-md font-medium">Cancelar cambios</span>
+    <FontAwesomeIcon :icon="faArrowLeft"
+      class="text-xl text-white group-hover:text-black transition-colors duration-300" />
+    <span
+      class="text-xl font-condensed-regular text-white group-hover:text-black transition-colors duration-300 uppercase">Cancelar
+      cambios</span>
   </RouterLink>
-  <button class="flex items-center gap-4 px-4 py-2 bg-orange-500 disabled:bg-gray-400 rounded-lg text-white"
-    data-testid="save-button" :disabled="saveButtonDisabled" @click="submitAvailability">
-    <FontAwesomeIcon :icon="faPaperPlane" class="text-md" />
-    <span class="text-md font-medium">Guardar</span>
+  <button
+    class="group flex items-center gap-3 cursor-pointer px-4 py-3 bg-orange-500 hover:bg-orange-600 transition-colors duration-300 disabled:bg-gray-400"
+    :class="{ 'pointer-events-none': saveButtonDisabled }" data-testid="save-button" :disabled="saveButtonDisabled"
+    @click="submitAvailability">
+    <FontAwesomeIcon :icon="faPaperPlane"
+      class="text-xl text-white group-hover:text-black group-disabled:text-gray-600 transition-colors duration-300" />
+    <span
+      class="text-xl font-condensed-regular text-white group-hover:text-black group-disabled:text-gray-600 transition-colors duration-300 uppercase">Guardar</span>
   </button>
 </template>
 
