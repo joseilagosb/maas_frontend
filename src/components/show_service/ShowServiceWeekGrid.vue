@@ -41,9 +41,9 @@ watch([userHoursAssignments, selectedWeek], () => {
   </div>
   <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 auto-rows-max gap-2" data-testid="grid">
     <div v-for="({ day, serviceHours: hours }, dayIndex) in selectedWeekData!.serviceDays" :key="day"
-      class="rounded-lg self-start bg-orange-300 relative overflow-hidden" data-testid="grid-day">
-      <div class="absolute top-0 left-0 w-full h-[40px] bg-orange-500 flex flex-col items-center justify-center">
-        <h2 class="text-xl font-bold text-white" data-testid="grid-day-date">
+      class="self-start bg-orange-700 relative overflow-hidden" data-testid="grid-day">
+      <div class="absolute top-0 left-0 w-full h-[40px] bg-orange-600 flex flex-col items-center justify-center">
+        <h2 class="text-2xl font-condensed-medium uppercase text-white" data-testid="grid-day-date">
           {{ formatDateInSpanish(addToDate('day', dayOfServiceWeek('first'), dayIndex)) }}
         </h2>
       </div>
@@ -54,12 +54,12 @@ watch([userHoursAssignments, selectedWeek], () => {
       ]" v-for="({ hour, designatedUser }, hourIndex) in hours" :key="hour" :data-testdayindex="dayIndex"
         :data-testhourindex="hourIndex" data-testid="grid-hour">
         <div class="w-[40%] flex items-center justify-center">
-          <span class="text-sm text-light" data-testid="grid-hour-time">
+          <span class="font-medium" data-testid="grid-hour-time">
             {{ getFormattedHour(hour) }}-{{ getFormattedHour(hour + 1) }}
           </span>
         </div>
         <div class="w-[60%] flex items-center justify-center">
-          <span class="text-sm font-bold" data-testid="grid-hour-designated-user">{{
+          <span class="font-medium" data-testid="grid-hour-designated-user">{{
             designatedUser ? designatedUser.name : 'Sin asignar'
             }}</span>
         </div>

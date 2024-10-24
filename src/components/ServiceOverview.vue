@@ -59,11 +59,9 @@ onMounted(() => {
   </div>
   <div v-else-if="service" class="size-full flex flex-col gap-4 items-start justify-start p-2" data-testid="service">
     <div class="w-full flex justify-between items-start pt-8">
-      <div class="flex flex-col items-left gap-4">
-        <h1 class="text-4xl font-light">
-          <FontAwesomeIcon :icon="faCalendarDay" class="text-md" />
-          {{ service.name }}
-        </h1>
+      <div class="flex flex-row items-left gap-3">
+        <FontAwesomeIcon :icon="faCalendarDay" class="text-5xl" />
+        <h1 class="text-5xl font-condensed-bold">{{ service.name }}</h1>
       </div>
       <div class="flex flex-row gap-2">
         <slot name="action-buttons"></slot>
@@ -72,31 +70,35 @@ onMounted(() => {
     <div class="size-full flex flex-row gap-4">
       <div class="w-[20%] flex flex-col gap-1">
         <select
-          class="px-4 py-2 bg-orange-300 rounded-lg transition duration-500 hover:bg-orange-400 disabled:bg-gray-300 hover:disabled:bg-gray-300"
+          class="p-4 bg-orange-400 text-lg transition duration-500 hover:bg-orange-500 disabled:bg-gray-300 hover:disabled:bg-gray-300"
           v-model="selectedWeek" @change="onChangeWeek" data-testid="week-select">
-          <option class="bg-orange-300" v-for="week in weekOptions" :key="week" :value="week">
+          <option class="bg-orange-400" v-for="week in weekOptions" :key="week" :value="week">
             {{ `Semana ${week} del ${getYear()}` }}
           </option>
         </select>
-        <p class="font-light text-sm text-gray-500 pl-5" data-testid="selected-week-range-text">
+        <p class="font-regular text-md text-gray-400 pl-5" data-testid="selected-week-range-text">
           del {{ formatDate(dayOfServiceWeek('first'), 'DD/MM/YYYY') }} al {{ formatDate(dayOfServiceWeek('last'),
             'DD/MM/YYYY') }}
         </p>
-        <h3 class="text-2xl font-light text-gray-500 pt-4">
-          <FontAwesomeIcon :icon="faClock" class="text-md pr-2" />
-          <span>Horas asignadas</span>
-        </h3>
-        <div class="border border-black rounded-xl py-1 flex flex-col gap-1 overflow-hidden">
+        <div class="flex items-center flex-row gap-2 pt-2">
+          <FontAwesomeIcon :icon="faClock" class="text-2xl pt-[3px]" />
+          <h3 class="text-3xl font-condensed-medium">Horas asignadas
+          </h3>
+        </div>
+        <div class="py-1 flex flex-col gap-2" :class="{ 'border border-black': !weekContainsData }">
           <div v-if="!weekContainsData" class="px-4 py-4 text-center" data-testid="no-user-hours-assignments-message">
             <span class="font-light text-3xl">Todavía no se han asignado usuarios para esta semana.</span>
           </div>
-          <div v-else class="h-[40px] w-full px-4 flex items-center justify-between"
+          <div v-else class="w-full px-4 py-2 flex items-center justify-between"
             :class="[`${USER_TAILWIND_COLORS[user.color]}`]" v-for="user in userHoursAssignments" :key="user.id"
             data-testid="user-hours-assignments">
-            <span class="font-light text-lg">{{ user.name }}</span>
-            <span class="font-light text-lg">{{ user.hoursCount }}</span>
+            <span class="font-light text-xl">{{ user.name }}</span>
+            <span class="font-light text-2xl">{{ user.hoursCount }}</span>
           </div>
-          <p class="font-bold text-center text-sm text-gray-500" data-testid="unassigned-hours-message">{{ "X" }} horas
+          <p class="text-center text-lg text-gray-400" data-testid="unassigned-hours-message">{{
+            "X"
+            }}
+            horas
             {{
               weekContainsData ? "sin asignar" :
                 "disponibles" }}</p>

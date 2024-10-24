@@ -55,7 +55,8 @@ const onClickLogout = () => {
           <FontAwesomeIcon :icon="faChevronDown"
             :class="{ 'transform rotate-180 duration-300': isUserMenuDropdownOpen }" class="text-lg text-white" />
         </div>
-        <div class="absolute right-0 w-[300px] top-[40px] overflow-hidden">
+        <div class="absolute right-0 w-[300px] top-[40px] overflow-hidden"
+          :class="{ 'pointer-events-auto': isUserMenuDropdownOpen, 'pointer-events-none': !isUserMenuDropdownOpen }">
           <div :class="{ 'translate-y-0': isUserMenuDropdownOpen, '-translate-y-32': !isUserMenuDropdownOpen }"
             class="float-right max-w-[200px] p-2 flex flex-col gap-1 bg-orange-600 transition-transform duration-300"
             data-testid="user-dropdown">

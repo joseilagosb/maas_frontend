@@ -43,10 +43,6 @@ describe('ServicesIndex', () => {
           })
         })
 
-        it('renders the services if it succeeds', () => {
-          expect(wrapper.find(servicesSelector).exists()).toBe(true)
-        })
-
         it('renders error if it fails', async () => {
           vi.mocked(getServices).mockImplementationOnce(async () => {
             return Promise.reject(new Error('error'))
@@ -83,7 +79,16 @@ describe('ServicesIndex', () => {
       })
     })
 
-    it('shows the correct router to prop for all services', () => {
+    it('renders the correct image for all services', () => {
+      wrapper.findAll(serviceSelector).forEach((service, serviceIndex) => {
+        const expectedService = testData.services[serviceIndex]
+        expect(service.find('img').attributes('src')).toContain(
+          `/assets/images/service_images/${expectedService.id}.jpg`
+        )
+      })
+    })
+
+    it('shows the correct router "to" prop for all services', () => {
       wrapper.findAll(serviceSelector).forEach((service, serviceIndex) => {
         const expectedService = testData.services[serviceIndex]
         expect(service.html()).toContain(`to="/services/${expectedService.id}"`)

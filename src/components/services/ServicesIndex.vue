@@ -22,8 +22,6 @@ onMounted(() => {
       isErrorVisible.value = true
     })
     .finally(() => {
-      console.log(homeStore.services.length)
-      randomImageIds.value.push(...generateRandomNumbers(homeStore.services.length, 1, 10))
       loading.value = false
     })
 })
@@ -57,9 +55,11 @@ onMounted(() => {
         </div>
         <RouterLink :to="`/services/${service.id}`"
           class="group/button self-end flex items-center justify-end p-4 gap-2 transition-colors duration-300 bg-orange-400 text-black hover:bg-orange-500">
-          <span class="text-lg text-white group-hover/button:text-black font-condensed-medium uppercase">Ver
+          <span
+            class="text-lg text-white group-hover/button:text-black font-condensed-medium uppercase transition-colors dutation-300">Ver
             turnos</span>
-          <FontAwesomeIcon :icon="faChevronRight" class="text-2xl text-white group-hover/button:text-black" />
+          <FontAwesomeIcon :icon="faChevronRight"
+            class="text-2xl text-white group-hover/button:text-black transition-colors dutation-300" />
         </RouterLink>
       </div>
     </div>
