@@ -30,5 +30,9 @@ export const mockAPIService = {
     }
   },
   getUserHoursAssignments: () => Promise.resolve(testData.userHoursAssignments),
-  putAvailability: () => Promise.resolve()
+  putAvailability: () =>
+    Promise.resolve({
+      status: 'success',
+      message: 'Schedule updated successfully'
+    })
 }

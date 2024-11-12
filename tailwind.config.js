@@ -18,6 +18,15 @@ export default {
         semibold: ['Open\\ Sans\\ Semi\\ Bold', 'sans-serif'],
         bold: ['Open\\ Sans\\ Bold', 'sans-serif'],
         'extra-bold': ['Open\\ Sans\\ Extra\\ Bold', 'sans-serif']
+      },
+      keyframes: {
+        'slide-up': {
+          '0%': { transform: 'translateY(20px)', opacity: 0.7 },
+          '100%': { transform: 'translateY(0)', opacity: 1 }
+        }
+      },
+      animation: {
+        'slide-up': 'slide-up 0.3s ease-out'
       }
     }
   },

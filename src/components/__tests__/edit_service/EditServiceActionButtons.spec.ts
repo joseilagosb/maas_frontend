@@ -71,15 +71,21 @@ describe('EditServiceActionButtons', () => {
       expect(saveButton.attributes().disabled).toBeUndefined()
     })
 
-    it('calls the submit availability action when clicked', async () => {
+    it('opens the confirm changes modal when clicked', async () => {
       const serviceAvailabilityStore = useServiceAvailabilityStore()
       serviceAvailabilityStore.$patch({ changedAvailability: true })
       await wrapper.vm.$nextTick()
 
+      expect(
+        wrapper.findComponent('[data-testid="confirm-changes-modal"]').attributes('isopen')
+      ).toBe('false')
+
       saveButton.trigger('click')
       await wrapper.vm.$nextTick()
 
-      expect(serviceAvailabilityStore.submitAvailability).toHaveBeenCalledTimes(1)
+      expect(
+        wrapper.findComponent('[data-testid="confirm-changes-modal"]').attributes('isopen')
+      ).toBe('true')
     })
   })
 })

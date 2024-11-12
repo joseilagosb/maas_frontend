@@ -5,13 +5,9 @@ import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 
 import { useHomeStore } from '@/stores/home';
 
-import { generateRandomNumbers } from '@/utils/common';
-
 const homeStore = useHomeStore()
 const loading = ref(true)
 const isErrorVisible = ref(false)
-
-const randomImageIds = ref<number[]>([])
 
 const getImageUrl = (index: number) => new URL(`../../assets/images/service_images/${index}.jpg`, import.meta.url).href
 
