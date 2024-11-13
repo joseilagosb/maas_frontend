@@ -7,11 +7,15 @@ import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 import { faWatchmanMonitoring } from '@fortawesome/free-brands-svg-icons'
 import { faEnvelope, faUserCircle } from '@fortawesome/free-regular-svg-icons'
 import { faChevronDown, faRightFromBracket } from '@fortawesome/free-solid-svg-icons'
+import { onClickOutside } from '@vueuse/core'
 
 const router = useRouter()
 const authStore = useAuthStore()
 
 const isUserMenuDropdownOpen = ref(false)
+
+const userDropdownToggleRef = ref<HTMLDivElement | null>(null)
+const userDropdownRef = ref<HTMLDivElement | null>(null)
 
 const toggleUserMenuDropdown = () => {
   isUserMenuDropdownOpen.value = !isUserMenuDropdownOpen.value
@@ -20,6 +24,10 @@ const toggleUserMenuDropdown = () => {
 const matchesWithCurrentRoute = (routeName: string) => {
   return router.currentRoute.value.name === routeName
 }
+
+onClickOutside(userDropdownRef, () => {
+  isUserMenuDropdownOpen.value = false
+}, { ignore: [userDropdownToggleRef] })
 
 const onClickLogout = () => {
   authStore.logout().catch((error) => {
@@ -47,19 +55,20 @@ const onClickLogout = () => {
     <div class="w-[600px] flex flex-row justify-end">
       <div v-if="authStore.isLoggedIn" class="relative">
         <div class="p-2 bg-orange-600 flex items-center gap-2 cursor-pointer select-none"
-          @click="toggleUserMenuDropdown" data-testid="user-selector">
+          @click="toggleUserMenuDropdown" data-testid="user-selector" ref="userDropdownToggleRef">
           <FontAwesomeIcon :icon="faUserCircle" class="text-lg text-white" />
           <span class="text-white text-lg font-condensed-medium" data-testid="welcome-message">{{
             authStore.user.name
-          }}</span>
+            }}</span>
           <FontAwesomeIcon :icon="faChevronDown"
             :class="{ 'transform rotate-180 duration-300': isUserMenuDropdownOpen }" class="text-lg text-white" />
         </div>
         <div class="absolute right-0 w-[300px] top-[40px] overflow-hidden"
-          :class="{ 'pointer-events-auto': isUserMenuDropdownOpen, 'pointer-events-none': !isUserMenuDropdownOpen }">
+          :class="{ 'pointer-events-auto': isUserMenuDropdownOpen, 'pointer-events-none': !isUserMenuDropdownOpen }"
+          data-testid="user-dropdown-container">
           <div :class="{ 'translate-y-0': isUserMenuDropdownOpen, '-translate-y-32': !isUserMenuDropdownOpen }"
             class="float-right max-w-[200px] p-2 flex flex-col gap-1 bg-orange-600 transition-transform duration-300"
-            data-testid="user-dropdown">
+            data-testid="user-dropdown" ref="userDropdownRef">
             <div class="flex items-center justify-end gap-2">
               <FontAwesomeIcon :icon="faEnvelope" class="text-lg text-white" />
               <span class="text-xl text-white font-condensed-medium">{{ authStore.user.email }}</span>

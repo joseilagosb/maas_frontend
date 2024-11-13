@@ -44,6 +44,8 @@ describe('MainLayout', () => {
 
     describe('when the user is logged in', () => {
       const userSelector = '[data-testid="user-selector"]'
+      const userDropdownContainerSelector = '[data-testid="user-dropdown-container"]'
+      const userDropdownSelector = '[data-testid="user-dropdown"]'
 
       beforeEach(() => {
         setUseRouterMock('home')
@@ -61,13 +63,36 @@ describe('MainLayout', () => {
       })
 
       it('displays the user dropdown when the user clicks on the user', async () => {
-        const userDropdownSelector = '[data-testid="user-dropdown"]'
+        expect(wrapper.find(userDropdownContainerSelector).classes()).toContain(
+          'pointer-events-none'
+        )
+        expect(wrapper.find(userDropdownSelector).classes()).toContain('-translate-y-32')
 
         await wrapper.find(userSelector).trigger('click')
-        expect(wrapper.find(userDropdownSelector).exists()).toBe(true)
+
+        expect(wrapper.find(userDropdownContainerSelector).classes()).toContain(
+          'pointer-events-auto'
+        )
+        expect(wrapper.find(userDropdownSelector).classes()).toContain('translate-y-0')
       })
 
-      it.todo('closes the user dropdown when the user clicks outside of it')
+      it('closes the user dropdown when the user clicks outside of it', async () => {
+        await wrapper.find(userSelector).trigger('click')
+
+        expect(wrapper.find(userDropdownContainerSelector).classes()).toContain(
+          'pointer-events-auto'
+        )
+        expect(wrapper.find(userDropdownSelector).classes()).toContain('translate-y-0')
+
+        window.dispatchEvent(new MouseEvent('click'))
+
+        await wrapper.vm.$nextTick()
+
+        expect(wrapper.find(userDropdownContainerSelector).classes()).toContain(
+          'pointer-events-none'
+        )
+        expect(wrapper.find(userDropdownSelector).classes()).toContain('-translate-y-32')
+      })
 
       it('sends back to login when the user clicks on the logout button', async () => {
         const logoutButtonSelector = '[data-testid="logout-button"]'
