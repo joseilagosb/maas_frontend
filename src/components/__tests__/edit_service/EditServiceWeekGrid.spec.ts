@@ -18,7 +18,6 @@ import { addToDate, formatDateInSpanish, getFormattedHour } from '@/services/dat
 
 import { USER_TAILWIND_COLORS } from '@/utils/constants'
 import { mockDateService } from '@/test/mocks/services/date'
-import { useAuthStore } from '@/stores/auth'
 
 describe('EditServiceWeekGrid', () => {
   vi.mock('vue-router')
@@ -355,6 +354,24 @@ describe('EditServiceWeekGrid', () => {
             firstCheckbox.setValue(!firstCheckbox.element.checked)
 
             expect(serviceAvailabilityStore.changedAvailability).toEqual(true)
+          })
+
+          it('triggers update to availability changes when a user is changed', () => {
+            const serviceAvailabilityStore = useServiceAvailabilityStore()
+            const firstCheckbox: DOMWrapper<HTMLInputElement> = wrapper
+              .find(gridHoursSelector)
+              .find(gridHourUserCheckboxSelector)
+
+            const newCheckedState = !firstCheckbox.element.checked
+
+            firstCheckbox.setValue(newCheckedState)
+
+            expect(serviceAvailabilityStore.updateAvailabilityChanges).toHaveBeenCalled()
+            expect(serviceAvailabilityStore.updateAvailabilityChanges).toHaveBeenCalledWith(
+              testData.serviceDays[0].day,
+              testData.serviceHours[0].hour,
+              newCheckedState
+            )
           })
         })
       })

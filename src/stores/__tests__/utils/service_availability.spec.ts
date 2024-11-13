@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { getAvailabilityData } from '@/stores/utils/service_availability'
+import { getAvailabilityData, updateAvailabilityChanges } from '@/stores/utils/service_availability'
 
 import { testData, testState, testTime } from '@/test/data'
 import type { Availability, AvailabilityHour } from '@/types/models'
@@ -108,6 +108,49 @@ describe('Service Availability Utils', () => {
           expect(result.available).toEqual(expected.available)
         )
       })
+    })
+  })
+
+  describe('updateAvailabilityChanges', () => {
+    const availabilityChanges = { 0: { 0: { marked: false }, 1: { marked: true } } }
+
+    it('adds a new day if its not present', () => {
+      const newDay = 1
+      const newHour = 0
+      const resultAvailabilityChanges = updateAvailabilityChanges(
+        availabilityChanges,
+        newDay,
+        newHour,
+        true
+      )
+
+      expect(Object.keys(resultAvailabilityChanges).length).toEqual(
+        Object.keys(availabilityChanges).length + 1
+      )
+    })
+
+    it('removes an hour if its present', () => {
+      const newDay = 0
+      const newHour = 1
+      const resultAvailabilityChanges = updateAvailabilityChanges(
+        availabilityChanges,
+        newDay,
+        newHour,
+        true
+      )
+
+      expect(Object.keys(resultAvailabilityChanges[newDay]).length).toEqual(
+        Object.keys(availabilityChanges[newDay]).length - 1
+      )
+    })
+
+    it('removes a day if all its hours are deleted', () => {
+      expect(Object.keys(availabilityChanges[0]).length).toBe(2)
+
+      let resultAvailabilityChanges = updateAvailabilityChanges(availabilityChanges, 0, 0, true)
+      resultAvailabilityChanges = updateAvailabilityChanges(resultAvailabilityChanges, 0, 1, true)
+
+      expect(resultAvailabilityChanges).not.toHaveProperty('0')
     })
   })
 })

@@ -8,13 +8,13 @@ import CustomModal from '@/components/CustomModal.vue'
 import { useServiceAvailabilityStore } from '@/stores/service_availability';
 
 const router = useRouter()
-const $toast = useToast();
+const $toast = useToast()
 
 const wasSubmitted = ref(false)
 
 const serviceAvailabilityStore = useServiceAvailabilityStore()
 
-import 'vue-toast-notification/dist/theme-sugar.css';
+import 'vue-toast-notification/dist/theme-sugar.css'
 
 const props = defineProps({
   isOpen: Boolean,
@@ -30,6 +30,8 @@ const submitAvailability = () => {
   serviceAvailabilityStore.submitAvailability().then(() => {
     router.back()
   }).catch((error: Error) => {
+    emit('modal-close')
+    wasSubmitted.value = false
     $toast.error(error.message)
   })
 }

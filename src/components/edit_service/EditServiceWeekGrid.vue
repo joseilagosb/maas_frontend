@@ -19,6 +19,11 @@ const serviceAvailabilityStore = useServiceAvailabilityStore()
 const { availabilityData } = storeToRefs(serviceAvailabilityStore)
 const { userHoursAssignments, weekContainsData, selectedWeek, selectedWeekData, dayOfServiceWeek } = storeToRefs(serviceStore)
 
+const onChangeCheckbox = (event: Event, day: number, hour: number) => {
+  serviceAvailabilityStore.changedAvailability = true
+  serviceAvailabilityStore.updateAvailabilityChanges(day, hour, (event.target as HTMLInputElement).checked)
+}
+
 watch([userHoursAssignments, selectedWeek], () => {
   loading.value = true
   isErrorVisible.value = false
@@ -73,7 +78,7 @@ watch([userHoursAssignments, selectedWeek], () => {
           :data-testhourindex="hourIndex" :data-testuserid="user.id">
           <input class="size-6" type="checkbox"
             v-model="availabilityData!.serviceDays[dayIndex].serviceHours[hourIndex].available[user.id]"
-            @change="serviceAvailabilityStore.changedAvailability = true" :disabled="+user.id !== authStore.user.id"
+            @change="event => onChangeCheckbox(event, day, hour)" :disabled="+user.id !== authStore.user.id"
             data-testid="grid-hour-user-checkbox" />
         </div>
       </div>

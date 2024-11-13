@@ -1,5 +1,6 @@
 import type {
   Availability,
+  AvailabilityChanges,
   ServiceDay,
   ServiceHour,
   ServiceWeek,
@@ -61,4 +62,29 @@ export const getAvailabilityData = (
       }
     })
   }
+}
+
+export const updateAvailabilityChanges = (
+  availabilityChanges: AvailabilityChanges,
+  day: number,
+  hour: number,
+  marked: boolean
+) => {
+  const resultAvailabilityChanges = JSON.parse(JSON.stringify(availabilityChanges))
+
+  if (!resultAvailabilityChanges[day]) {
+    resultAvailabilityChanges[day] = {}
+  }
+
+  if (resultAvailabilityChanges[day][hour]) {
+    delete resultAvailabilityChanges[day][hour]
+  } else {
+    resultAvailabilityChanges[day][hour] = { marked: marked }
+  }
+
+  if (Object.keys(resultAvailabilityChanges[day]).length === 0) {
+    delete resultAvailabilityChanges[day]
+  }
+
+  return resultAvailabilityChanges
 }

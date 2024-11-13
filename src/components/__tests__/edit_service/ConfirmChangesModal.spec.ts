@@ -2,15 +2,15 @@ import type { ComponentPublicInstance } from 'vue'
 import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest'
 import { mount, VueWrapper } from '@vue/test-utils'
 import { createTestingPinia } from '@pinia/testing'
+import { useRoute, useRouter } from 'vue-router'
+import { useToast } from 'vue-toast-notification'
 
 import ConfirmChangesModal from '@/components/edit_service/ConfirmChangesModal.vue'
 
 import { testParams, testState } from '@/test/data'
 import { useServiceAvailabilityStore } from '@/stores/service_availability'
-import { useRoute, useRouter } from 'vue-router'
 import { putAvailability } from '@/services/api'
 import { mockAPIService } from '@/test/mocks/services/api'
-import { useToast } from 'vue-toast-notification'
 
 describe('ConfirmChangesModal', () => {
   let serviceAvailabilityStore: ReturnType<typeof useServiceAvailabilityStore>
@@ -90,9 +90,7 @@ describe('ConfirmChangesModal', () => {
           await wrapper.vm.$nextTick()
         })
 
-        it('shows the toast error message', async () => {
-          await wrapper.vm.$nextTick()
-
+        it('shows the toast error message', () => {
           expect(useToast().error).toHaveBeenCalled()
         })
       })

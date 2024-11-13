@@ -58,3 +58,11 @@ export type AvailabilityHour = {
   hour: number
   available: { [key: number]: boolean }
 }
+
+export type AvailabilityChanges = {
+  [day: number]: {
+    [hour: number]: {
+      marked: boolean
+    }
+  }
+}

@@ -7,6 +7,7 @@ import { useServiceStore } from '../service'
 
 import { testParams, testState } from '@/test/data'
 import { putAvailability } from '@/services/api'
+import { useAuthStore } from '../auth'
 
 describe('Service Availability Store', () => {
   vi.mock('vue-router')
@@ -37,6 +38,9 @@ describe('Service Availability Store', () => {
       const serviceStore = useServiceStore()
       serviceStore.$patch({ ...testState.editServiceStore })
 
+      const authStore = useAuthStore()
+      authStore.$patch({ user: testState.userAuthStore.user })
+
       serviceAvailabilityStore = useServiceAvailabilityStore()
     })
 
@@ -56,13 +60,24 @@ describe('Service Availability Store', () => {
       })
     })
 
+    describe('updateAvailabilityChanges', () => {
+      it('updates the availability changes', () => {
+        const expectedAvailabilityChanges = { 0: { 0: { marked: true } } }
+
+        serviceAvailabilityStore.updateAvailabilityChanges(0, 0, true)
+        expect(serviceAvailabilityStore.availabilityChanges).toEqual(expectedAvailabilityChanges)
+      })
+    })
+
     describe('submitAvailability', () => {
       it('fetches to api put route', async () => {
         await serviceAvailabilityStore.submitAvailability()
         expect(putAvailability).toHaveBeenCalledWith(
           testParams.service.id,
           testParams.service.week,
-          serviceAvailabilityStore.availabilityData
+          serviceAvailabilityStore.availabilityData,
+          serviceAvailabilityStore.availabilityChanges,
+          testState.userAuthStore.user
         )
       })
     })
