@@ -195,8 +195,7 @@ export const testState = {
   },
   get serviceAvailabilityStore() {
     return {
-      availabilityData: testData.serviceAvailability,
-      changedAvailability: false
+      availabilityData: testData.serviceAvailability
     }
   }
 }

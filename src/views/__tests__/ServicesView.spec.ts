@@ -28,7 +28,7 @@ describe('ServicesView', () => {
       expect(wrapper.findComponent(ServicesIndex).exists()).toBe(true)
     })
 
-    it.todo('renders available hours if its a user', () => {
+    it('renders available hours if its a user', () => {
       const myAvailableHoursTitle = wrapper.find(myAvailableHoursSelector).find('h2')
       expect(myAvailableHoursTitle.text()).toEqual('Mis horas disponibles')
     })

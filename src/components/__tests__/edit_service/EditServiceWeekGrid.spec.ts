@@ -349,11 +349,11 @@ describe('EditServiceWeekGrid', () => {
               .find(gridHoursSelector)
               .find(gridHourUserCheckboxSelector)
 
-            expect(serviceAvailabilityStore.changedAvailability).toEqual(false)
+            expect(Object.keys(serviceAvailabilityStore.availabilityChanges).length).toEqual(0)
 
             firstCheckbox.setValue(!firstCheckbox.element.checked)
 
-            expect(serviceAvailabilityStore.changedAvailability).toEqual(true)
+            expect(Object.keys(serviceAvailabilityStore.availabilityChanges).length).toEqual(1)
           })
 
           it('triggers update to availability changes when a user is changed', () => {

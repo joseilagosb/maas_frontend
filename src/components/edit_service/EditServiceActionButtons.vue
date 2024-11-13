@@ -14,7 +14,7 @@ import { faPaperPlane } from '@fortawesome/free-regular-svg-icons'
 const saveButtonDisabled = ref(true)
 
 const serviceAvailabilityStore = useServiceAvailabilityStore()
-const { changedAvailability } = storeToRefs(serviceAvailabilityStore)
+const { availabilityChanges } = storeToRefs(serviceAvailabilityStore)
 
 const confirmChangesModalIsOpen = ref(false)
 
@@ -26,8 +26,12 @@ const closeConfirmChangesModal = () => {
   confirmChangesModalIsOpen.value = false
 }
 
-watch([changedAvailability], () => {
-  saveButtonDisabled.value = false
+watch([availabilityChanges], () => {
+  if (Object.keys(availabilityChanges.value).length > 0) {
+    saveButtonDisabled.value = false
+  } else {
+    saveButtonDisabled.value = true
+  }
 })
 </script>
 

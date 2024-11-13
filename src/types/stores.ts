@@ -27,6 +27,5 @@ export type ServiceState = {
 
 export type ServiceAvailabilityState = {
   availabilityData?: Availability
-  changedAvailability: boolean
   availabilityChanges: AvailabilityChanges
 }

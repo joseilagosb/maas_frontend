@@ -1,5 +1,5 @@
 import type { ComponentPublicInstance } from 'vue'
-import { afterAll, describe, expect, it, vi } from 'vitest'
+import { afterAll, beforeEach, describe, expect, it, vi } from 'vitest'
 import { RouterLinkStub, shallowMount, VueWrapper } from '@vue/test-utils'
 import { useRoute, type RouterLinkProps } from 'vue-router'
 import { createTestingPinia } from '@pinia/testing'
@@ -14,10 +14,6 @@ describe('EditServiceActionButtons', () => {
   vi.mock('vue-router')
   vi.mocked(useRoute).mockReturnValue({ params: testParams.service } as any)
 
-  afterAll(() => {
-    vi.restoreAllMocks()
-  })
-
   const discardChangesButtonSelector = '[data-testid="discard-changes-button"]'
   const saveButtonSelector = '[data-testid="save-button"]'
 
@@ -25,7 +21,10 @@ describe('EditServiceActionButtons', () => {
     global: {
       plugins: [
         createTestingPinia({
-          initialState: { user: testState.userAuthStore, service: testState.editServiceStore },
+          initialState: {
+            user: testState.userAuthStore,
+            service: testState.editServiceStore
+          },
           stubActions: false
         })
       ],
@@ -33,6 +32,12 @@ describe('EditServiceActionButtons', () => {
         RouterLink: RouterLinkStub
       }
     }
+  })
+
+  const serviceAvailabilityStore = useServiceAvailabilityStore()
+
+  afterAll(() => {
+    vi.restoreAllMocks()
   })
 
   describe('discard changes button', () => {
@@ -54,6 +59,10 @@ describe('EditServiceActionButtons', () => {
   describe('save button', () => {
     const saveButton = wrapper.find(saveButtonSelector)
 
+    beforeEach(() => {
+      useServiceAvailabilityStore().$reset()
+    })
+
     it('exists', () => {
       expect(saveButton.exists()).toBe(true)
     })
@@ -63,17 +72,36 @@ describe('EditServiceActionButtons', () => {
     })
 
     it('is enabled when the availability changes', async () => {
-      const serviceAvailabilityStore = useServiceAvailabilityStore()
-      serviceAvailabilityStore.$patch({ changedAvailability: true })
+      serviceAvailabilityStore.$patch((state) => {
+        state.availabilityChanges = { 1: { 1: { marked: true } } }
+      })
 
       await wrapper.vm.$nextTick()
 
       expect(saveButton.attributes().disabled).toBeUndefined()
     })
 
+    it('is disabled when the availability changes is back to empty', async () => {
+      serviceAvailabilityStore.$patch((state) => {
+        state.availabilityChanges = { 1: { 1: { marked: true } } }
+      })
+
+      await wrapper.vm.$nextTick()
+
+      serviceAvailabilityStore.$patch((state) => {
+        state.availabilityChanges = {}
+      })
+
+      await wrapper.vm.$nextTick()
+
+      expect(saveButton.attributes().disabled).toEqual('')
+    })
+
     it('opens the confirm changes modal when clicked', async () => {
       const serviceAvailabilityStore = useServiceAvailabilityStore()
-      serviceAvailabilityStore.$patch({ changedAvailability: true })
+      serviceAvailabilityStore.$patch((state) => {
+        state.availabilityChanges = { 1: { 1: { marked: true } } }
+      })
       await wrapper.vm.$nextTick()
 
       expect(

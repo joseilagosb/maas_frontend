@@ -11,7 +11,6 @@ import { useAuthStore } from './auth'
 export const useServiceAvailabilityStore = defineStore('service_availability', {
   state: (): ServiceAvailabilityState => ({
     availabilityData: undefined,
-    changedAvailability: false,
     availabilityChanges: {}
   }),
   actions: {

@@ -20,7 +20,6 @@ const { availabilityData } = storeToRefs(serviceAvailabilityStore)
 const { userHoursAssignments, weekContainsData, selectedWeek, selectedWeekData, dayOfServiceWeek } = storeToRefs(serviceStore)
 
 const onChangeCheckbox = (event: Event, day: number, hour: number) => {
-  serviceAvailabilityStore.changedAvailability = true
   serviceAvailabilityStore.updateAvailabilityChanges(day, hour, (event.target as HTMLInputElement).checked)
 }
 

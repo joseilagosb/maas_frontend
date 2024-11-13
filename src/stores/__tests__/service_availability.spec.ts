@@ -27,7 +27,7 @@ describe('Service Availability Store', () => {
 
     it('initializes the store', () => {
       expect(serviceAvailabilityStore.availabilityData).toBeUndefined()
-      expect(serviceAvailabilityStore.changedAvailability).toBe(false)
+      expect(serviceAvailabilityStore.availabilityChanges).toEqual({})
     })
   })
 
