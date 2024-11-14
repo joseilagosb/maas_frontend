@@ -37,7 +37,9 @@ describe('router', async () => {
     }
 
     beforeEach(() => {
-      pinia = createTestingPinia({ initialState: { auth: testState.userAuthStore } })
+      pinia = createTestingPinia({
+        initialState: { auth: testState.userAuthStore, service: testState.showServiceStore }
+      })
       router = createRouter({
         history: createWebHistory(),
         routes: routes
@@ -73,6 +75,29 @@ describe('router', async () => {
         expect(wrapper.vm.$route.name).toBe('show-service-week')
         expect(+wrapper.vm.$route.params.id).toEqual(expectedParams.id)
         expect(+wrapper.vm.$route.params.week).toEqual(expectedParams.week)
+      })
+    })
+
+    describe('navigation to /services/:id/weeks/:week/edit', () => {
+      it('redirects to /services/:id/weeks/:week if its the past week', async () => {
+        router.push(`/services/${testData.service.id}/weeks/${testTime.week - 1}/edit`)
+        await router.isReady()
+
+        expect(wrapper.vm.$route.name).toBe('show-service-week')
+      })
+
+      it('navigates normally if its the current week', async () => {
+        router.push(`/services/${testData.service.id}/weeks/${testTime.week}/edit`)
+        await router.isReady()
+
+        expect(wrapper.vm.$route.name).toBe('edit-service-week')
+      })
+
+      it('navigates normally if its a future week', async () => {
+        router.push(`/services/${testData.service.id}/weeks/${testTime.week + 1}/edit`)
+        await router.isReady()
+
+        expect(wrapper.vm.$route.name).toBe('edit-service-week')
       })
     })
   })

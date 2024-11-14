@@ -49,7 +49,9 @@ export const routes: Array<RouteRecordRaw> = [
       {
         path: 'weeks/:week/edit',
         name: 'edit-service-week',
-        component: EditServiceWeekView
+        component: EditServiceWeekView,
+        beforeEnter: (from: RouteLocationNormalizedGeneric) =>
+          onlyAllowEditingCurrentOrFutureWeeks(from)
       }
     ]
   },
@@ -64,6 +66,14 @@ const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes
 })
+
+export const onlyAllowEditingCurrentOrFutureWeeks = async (
+  from: RouteLocationNormalizedGeneric
+) => {
+  if (+from.params.week < getWeek()) {
+    return { name: 'show-service-week', params: from.params }
+  }
+}
 
 export const checkIfNotLoggedIn = async (to: RouteLocationNormalizedGeneric) => {
   const authStore = useAuthStore()

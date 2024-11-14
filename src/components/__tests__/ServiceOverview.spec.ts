@@ -122,48 +122,86 @@ describe('ServiceOverview', () => {
     describe('week selector', () => {
       const weekSelectSelector = '[data-testid="week-select"]'
 
-      it('exists', () => {
-        expect(wrapper.find(weekSelectSelector).exists()).toBe(true)
-      })
+      describe('when the route name is show-service-week', () => {
+        beforeEach(async () => {
+          vi.mocked(useRoute).mockReturnValue({
+            name: 'show-service-week',
+            params: testParams.service
+          } as any)
 
-      it('has the correct weeks', () => {
-        const weekOptions = wrapper.find(weekSelectSelector).findAll('option')
-        const weekOptionsFromComponentState = wrapper.vm.weekOptions
-        expect(weekOptions.map((weekOption) => +weekOption.element.value)).toEqual(
-          weekOptionsFromComponentState
-        )
-      })
+          wrapper = shallowMountWithPinia(ServiceOverview, {
+            initialState: { auth: testState.userAuthStore, service: testState.showServiceStore },
+            stubActions: false
+          })
+          await flushPromises()
+        })
 
-      it('shows five weeks in the future', () => {
-        const weekOptions = wrapper.find(weekSelectSelector).findAll('option').slice(-5)
-        const serviceStore = useServiceStore()
+        it('exists', () => {
+          expect(wrapper.find(weekSelectSelector).exists()).toBe(true)
+        })
 
-        for (const weekOption of weekOptions) {
-          expect(serviceStore.activeWeeks).not.toContain(+weekOption.element.value)
-        }
-      })
-
-      it('renders the correct text in the options', () => {
-        const weekOptions = wrapper.find(weekSelectSelector).findAll('option')
-        const weekOptionsFromComponentState = wrapper.vm.weekOptions
-
-        for (let i = 0; i < weekOptions.length; i++) {
-          const weekOption = weekOptions[i]
-          expect(weekOption.element.text).toEqual(
-            `Semana ${weekOptionsFromComponentState[i]} del ${testTime.year}`
+        it('has the correct weeks', () => {
+          const weekOptions = wrapper.find(weekSelectSelector).findAll('option')
+          const weekOptionsFromComponentState = wrapper.vm.weekOptions
+          expect(weekOptions.map((weekOption) => +weekOption.element.value)).toEqual(
+            weekOptionsFromComponentState
           )
-        }
+        })
+
+        it('shows five weeks in the future', () => {
+          const weekOptions = wrapper.find(weekSelectSelector).findAll('option').slice(-5)
+          const serviceStore = useServiceStore()
+
+          for (const weekOption of weekOptions) {
+            expect(serviceStore.activeWeeks).not.toContain(+weekOption.element.value)
+          }
+        })
+
+        it('renders the correct text in the options', () => {
+          const weekOptions = wrapper.find(weekSelectSelector).findAll('option')
+          const weekOptionsFromComponentState = wrapper.vm.weekOptions
+
+          for (let i = 0; i < weekOptions.length; i++) {
+            const weekOption = weekOptions[i]
+            expect(weekOption.element.text).toEqual(
+              `Semana ${weekOptionsFromComponentState[i]} del ${testTime.year}`
+            )
+          }
+        })
+
+        it('changes the route when a week is selected', async () => {
+          const weekSelect = wrapper.find(weekSelectSelector)
+          const firstOption = weekSelect.findAll('option')[0]
+          const router = useRouter()
+
+          await weekSelect.setValue(firstOption.element.value)
+
+          expect(router.replace).toHaveBeenCalledWith({
+            params: { week: +firstOption.element.value }
+          })
+        })
       })
 
-      it('changes the route when a week is selected', async () => {
-        const weekSelect = wrapper.find(weekSelectSelector)
-        const firstOption = weekSelect.findAll('option')[0]
-        const router = useRouter()
+      describe('when the route name is edit-service-week', () => {
+        afterAll(() => {
+          vi.mocked(useRoute).mockReturnValue({ params: testParams.service } as any)
+        })
 
-        await weekSelect.setValue(firstOption.element.value)
+        beforeEach(async () => {
+          vi.mocked(useRoute).mockReturnValue({
+            name: 'edit-service-week',
+            params: testParams.service
+          } as any)
 
-        expect(router.replace).toHaveBeenCalledWith({
-          params: { week: +firstOption.element.value }
+          wrapper = shallowMountWithPinia(ServiceOverview, {
+            initialState: { auth: testState.userAuthStore, service: testState.showServiceStore },
+            stubActions: false
+          })
+          await flushPromises()
+        })
+
+        it('is disabled', () => {
+          expect(wrapper.find(weekSelectSelector).attributes().disabled).toBeDefined()
         })
       })
     })

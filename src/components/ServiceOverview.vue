@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, onMounted, ref, watch } from 'vue'
-import { useRouter } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { storeToRefs } from 'pinia'
 
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
@@ -17,6 +17,8 @@ import { USER_TAILWIND_COLORS } from '@/utils/constants'
 const loading = ref(true)
 const isErrorVisible = ref(false)
 
+const route = useRoute()
+
 const serviceStore = useServiceStore()
 const { service, userHoursAssignments, dayOfServiceWeek, selectedWeek, activeWeeks, weekContainsData, numberOfUnassignedHours } = storeToRefs(serviceStore)
 
@@ -29,6 +31,11 @@ const weekOptions = computed(() => {
   // Se retorna el intervalo de semanas actuales, más la semana actual insertada en el orden
   // del array si no está incluida y las semanas adicionales al final
   return [...addToSortedArray(activeWeeks.value, currentWeek), ...additionalWeeks]
+})
+
+const isDisabledWeekSelect = computed(() => {
+  console.log("hai", route.name)
+  return route.name === 'edit-service-week'
 })
 
 const router = useRouter()
@@ -70,8 +77,8 @@ onMounted(() => {
     <div class="size-full flex flex-row gap-4">
       <div class="w-[20%] flex flex-col gap-1">
         <select
-          class="p-4 bg-orange-400 text-lg transition duration-500 hover:bg-orange-500 disabled:bg-gray-300 hover:disabled:bg-gray-300"
-          v-model="selectedWeek" @change="onChangeWeek" data-testid="week-select">
+          class="p-4 bg-orange-400 text-lg transition duration-500 hover:bg-orange-500 disabled:bg-gray-400 hover:disabled:bg-gray-400"
+          v-model="selectedWeek" @change="onChangeWeek" data-testid="week-select" :disabled="isDisabledWeekSelect">
           <option class="bg-orange-400" v-for="week in weekOptions" :key="week" :value="week">
             {{ `Semana ${week} del ${getYear()}` }}
           </option>
