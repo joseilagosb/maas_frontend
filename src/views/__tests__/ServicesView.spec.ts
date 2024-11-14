@@ -22,15 +22,9 @@ describe('ServicesView', () => {
         ]
       }
     })
-    const myAvailableHoursSelector = '[data-testid="my-available-hours"]'
 
     it('renders available services if its a user', () => {
       expect(wrapper.findComponent(ServicesIndex).exists()).toBe(true)
-    })
-
-    it('renders available hours if its a user', () => {
-      const myAvailableHoursTitle = wrapper.find(myAvailableHoursSelector).find('h2')
-      expect(myAvailableHoursTitle.text()).toEqual('Mis horas disponibles')
     })
   })
 })

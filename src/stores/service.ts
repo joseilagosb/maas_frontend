@@ -42,6 +42,18 @@ export const useServiceStore = defineStore('service', {
         const dayDate = nthDayOfWeek(this.selectedWeek, selectedDay)
         return dayDate
       }
+    },
+    numberOfUnassignedHours: (state: ServiceState) => {
+      const totalAssignedHours: number = state.userHoursAssignments.reduce(
+        (acc, curr) => curr.hoursCount + acc,
+        0
+      )
+      const totalHours = state.service!.serviceWorkingDays.reduce(
+        (acc, curr) => curr.to - curr.from + 1 + acc,
+        0
+      )
+
+      return totalHours - totalAssignedHours
     }
   },
   actions: {
@@ -52,6 +64,7 @@ export const useServiceStore = defineStore('service', {
           id: service.id,
           type: service.type,
           name: service.name,
+          description: service.description,
           active: service.active,
           serviceWorkingDays: service.serviceWorkingDays
         } as Service

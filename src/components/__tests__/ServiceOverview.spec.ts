@@ -1,5 +1,5 @@
 import type { ComponentPublicInstance } from 'vue'
-import { describe, it, expect, vi, afterAll, beforeEach } from 'vitest'
+import { describe, it, expect, vi, afterAll, beforeEach, beforeAll } from 'vitest'
 import { useRoute, useRouter } from 'vue-router'
 import { flushPromises, VueWrapper } from '@vue/test-utils'
 
@@ -208,11 +208,15 @@ describe('ServiceOverview', () => {
 
       describe('week doesnt contain data', () => {
         beforeEach(async () => {
+          // Modificamos el mock de getUserHoursAssignments para que devuelva cero horas asignadas
+          vi.mocked(getUserHoursAssignments).mockImplementationOnce(() => Promise.resolve([]))
+
           const serviceStore = useServiceStore()
           // Eliminamos la semana actual de la lista de semanas activas, que es la variable que se revisa con
           // el getter weekContainsData
-          serviceStore.$patch({
-            activeWeeks: [...serviceStore.activeWeeks.filter((week) => week !== testTime.week)]
+          serviceStore.$patch((state) => {
+            state.activeWeeks = [...state.activeWeeks.filter((week) => week !== testTime.week)]
+            state.selectedWeek = state.selectedWeek + 1
           })
           await wrapper.vm.$nextTick()
         })
@@ -222,7 +226,14 @@ describe('ServiceOverview', () => {
         })
 
         it('shows the correct text in the unassigned hours count', () => {
-          expect(wrapper.find(unassignedHoursMessageSelector).text()).toContain('disponibles')
+          const totalHours = testData.serviceWorkingDays.reduce(
+            (acc, curr) => curr.to - curr.from + 1 + acc,
+            0
+          )
+
+          expect(wrapper.find(unassignedHoursMessageSelector).text()).toContain(
+            `${totalHours} horas disponibles`
+          )
         })
       })
 
@@ -259,13 +270,20 @@ describe('ServiceOverview', () => {
         })
 
         it('shows the correct text in the unassigned hours count', () => {
-          expect(wrapper.find(unassignedHoursMessageSelector).text()).toContain('sin asignar')
+          const totalHours = testData.serviceWorkingDays.reduce(
+            (acc, curr) => curr.to - curr.from + 1 + acc,
+            0
+          )
+          const unassignedHours = testData.userHoursAssignments.reduce(
+            (acc, curr) => curr.hoursCount + acc,
+            0
+          )
+
+          expect(wrapper.find(unassignedHoursMessageSelector).text()).toContain(
+            `${totalHours - unassignedHours} horas sin asignar`
+          )
         })
       })
-    })
-
-    describe('unassigned hours count', () => {
-      it.todo('shows the number of unassigned hours')
     })
   })
 })

@@ -18,7 +18,7 @@ const loading = ref(true)
 const isErrorVisible = ref(false)
 
 const serviceStore = useServiceStore()
-const { service, userHoursAssignments, dayOfServiceWeek, selectedWeek, activeWeeks, weekContainsData } = storeToRefs(serviceStore)
+const { service, userHoursAssignments, dayOfServiceWeek, selectedWeek, activeWeeks, weekContainsData, numberOfUnassignedHours } = storeToRefs(serviceStore)
 
 const weekOptions = computed(() => {
   const currentWeek = getWeek()
@@ -96,8 +96,8 @@ onMounted(() => {
             <span class="font-light text-2xl">{{ user.hoursCount }}</span>
           </div>
           <p class="text-center text-lg text-gray-700" data-testid="unassigned-hours-message">{{
-            "X"
-            }}
+            numberOfUnassignedHours
+          }}
             horas
             {{
               weekContainsData ? "sin asignar" :
