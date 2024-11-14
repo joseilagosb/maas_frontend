@@ -76,7 +76,7 @@ onMounted(() => {
             {{ `Semana ${week} del ${getYear()}` }}
           </option>
         </select>
-        <p class="font-regular text-md text-gray-400 pl-5" data-testid="selected-week-range-text">
+        <p class="font-regular text-md text-gray-700 pl-5" data-testid="selected-week-range-text">
           del {{ formatDate(dayOfServiceWeek('first'), 'DD/MM/YYYY') }} al {{ formatDate(dayOfServiceWeek('last'),
             'DD/MM/YYYY') }}
         </p>
@@ -95,9 +95,9 @@ onMounted(() => {
             <span class="font-light text-xl">{{ user.name }}</span>
             <span class="font-light text-2xl">{{ user.hoursCount }}</span>
           </div>
-          <p class="text-center text-lg text-gray-400" data-testid="unassigned-hours-message">{{
+          <p class="text-center text-lg text-gray-700" data-testid="unassigned-hours-message">{{
             "X"
-          }}
+            }}
             horas
             {{
               weekContainsData ? "sin asignar" :

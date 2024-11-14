@@ -20,11 +20,6 @@ const authStore = useAuthStore()
         <template #action-buttons>
           <ServicesActionButtons />
         </template>
-        <template v-if="authStore.isUser" #sidebar>
-          <div class="flex flex-col gap-4 p-4" data-testid="my-available-hours">
-            <h2 class="text-2xl font-bold">Mis horas disponibles</h2>
-          </div>
-        </template>
       </PageLayout>
     </MainLayout>
   </router-view>

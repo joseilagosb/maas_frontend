@@ -38,15 +38,10 @@ watchEffect(() => {
 </script>
 
 <template>
-  <section
-    class="flex flex-col items-center justify-center gap-6 bg-orange-200 py-8 px-8 rounded-2xl shadow-xl"
-  >
-    <div
-      v-if="redirected === 'loggedout' || redirected === 'notloggedin'"
-      class="w-full flex flex-col gap-2 bg-yellow-200 p-4 rounded-lg shadow-md"
-      data-testid="flash-message"
-    >
-      <h4 class="text-md text-yellow-800">
+  <section class="flex flex-col items-center justify-center gap-6 bg-orange-300 py-12 px-8 shadow-xl">
+    <div v-if="redirected === 'loggedout' || redirected === 'notloggedin'"
+      class="w-full flex flex-col gap-2 bg-yellow-200 p-4 shadow-md" data-testid="flash-message">
+      <h4 class="text-md text-yellow-700 font-bold">
         {{
           redirected === 'loggedout'
             ? 'Has cerrado sesión con éxito.'
@@ -55,37 +50,21 @@ watchEffect(() => {
       </h4>
     </div>
     <form class="flex flex-col gap-8 min-w-[500px]" @submit.prevent="onSubmit">
-      <input
-        id="email"
-        class="outline-none text-xl p-2 bg-transparent transform duration-500 border-b-2 select-none placeholder:italic placeholder:text-gray-500 focus-within:border-orange-500 focus:outline-none"
-        v-model="email"
-        type="email"
-        placeholder="Correo electrónico"
-        autocomplete="email"
-      />
-      <input
-        id="password"
-        class="outline-none text-xl p-2 bg-transparent transform duration-500 border-b-2 select-none placeholder:italic placeholder:text-gray-500 focus-within:border-orange-500 focus:outline-none"
-        v-model="password"
-        type="password"
-        placeholder="Contraseña"
-        autocomplete="current-password"
-      />
-      <div
-        v-if="isErrorVisible"
-        data-testid="error-message"
-        class="flex flex-col gap-2 bg-red-300 p-4 rounded-lg shadow-md"
-      >
-        <h4 class="text-md text-red-800">Ha ocurrido un error al iniciar sesión.</h4>
-        <p class="text-sm text-red-800">
+      <input id="email"
+        class="outline-none text-xl p-2 bg-transparent transform duration-500 border-b-2 border-gray-300 select-none placeholder:text-gray-500 placeholder:font-medium focus-within:border-orange-500 focus:outline-none"
+        v-model="email" type="email" placeholder="Correo electrónico" autocomplete="email" />
+      <input id="password"
+        class="outline-none text-xl p-2 bg-transparent transform duration-500 border-b-2 border-gray-300 select-none placeholder:text-gray-500 placeholder:font-medium focus-within:border-orange-500 focus:outline-none"
+        v-model="password" type="password" placeholder="Contraseña" autocomplete="current-password" />
+      <div v-if="isErrorVisible" data-testid="error-message" class="flex flex-col gap-2 bg-red-300 p-4 shadow-md">
+        <h4 class="font-bold text-md text-red-800">Ha ocurrido un error al iniciar sesión.</h4>
+        <p class="font-medium text-sm text-red-800">
           Comprueba que las credenciales que ingresaste estén correctas.
         </p>
       </div>
-      <button
-        type="submit"
-        class="block w-full select-none rounded-lg bg-orange-300 text-black py-3 px-6 text-center font-sans text-md font-bold uppercase shadow shadow-gray-900/10 transition-all hover:shadow-md hover:shadow-gray-900/20 active:opacity-[0.85] disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none"
-        :disabled="isDisabledSubmit || isSubmitting"
-      >
+      <button type="submit"
+        class="block w-full select-none bg-orange-400 text-black py-4 px-4 text-center font-condensed-bold text-xl font-bold uppercase shadow shadow-gray-900/10 transition-all hover:shadow-md hover:shadow-gray-900/20 active:opacity-[0.85] disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none"
+        :disabled="isDisabledSubmit || isSubmitting">
         Iniciar sesión
       </button>
     </form>

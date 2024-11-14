@@ -25,6 +25,8 @@ const matchesWithCurrentRoute = (routeName: string) => {
   return router.currentRoute.value.name === routeName
 }
 
+const backgroundUrl = () => new URL('../../assets/images/background.jpg', import.meta.url).href
+
 onClickOutside(userDropdownRef, () => {
   isUserMenuDropdownOpen.value = false
 }, { ignore: [userDropdownToggleRef] })
@@ -59,7 +61,7 @@ const onClickLogout = () => {
           <FontAwesomeIcon :icon="faUserCircle" class="text-lg text-white" />
           <span class="text-white text-lg font-condensed-medium" data-testid="welcome-message">{{
             authStore.user.name
-            }}</span>
+          }}</span>
           <FontAwesomeIcon :icon="faChevronDown"
             :class="{ 'transform rotate-180 duration-300': isUserMenuDropdownOpen }" class="text-lg text-white" />
         </div>
@@ -90,7 +92,8 @@ const onClickLogout = () => {
       </div>
     </div>
   </header>
-  <main class="flex flex-col items-center justify-center h-[calc(100vh-60px)]">
+  <main class="flex flex-col items-center justify-center h-[calc(100vh-60px)] bg-cover bg-center"
+    :style="{ backgroundImage: 'linear-gradient(rgba(255, 255, 255, 0.7), rgba(255, 255, 255, 0.7)), url(' + backgroundUrl() + ')' }">
     <slot />
   </main>
 </template>
