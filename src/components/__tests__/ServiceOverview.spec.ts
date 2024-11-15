@@ -250,10 +250,7 @@ describe('ServiceOverview', () => {
           vi.mocked(getUserHoursAssignments).mockImplementationOnce(() => Promise.resolve([]))
 
           const serviceStore = useServiceStore()
-          // Eliminamos la semana actual de la lista de semanas activas, que es la variable que se revisa con
-          // el getter weekContainsData
           serviceStore.$patch((state) => {
-            state.activeWeeks = [...state.activeWeeks.filter((week) => week !== testTime.week)]
             state.selectedWeek = state.selectedWeek + 1
           })
           await wrapper.vm.$nextTick()

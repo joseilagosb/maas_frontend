@@ -51,11 +51,6 @@ describe('Service Store', () => {
         expect(serviceStore.service).toBeDefined()
         expect(serviceStore.service).toEqual(testState.serviceStore.service)
       })
-
-      it('generates the activeWeeks array', () => {
-        expect(serviceStore.activeWeeks).toBeDefined()
-        expect(serviceStore.activeWeeks).toEqual(testState.serviceStore.activeWeeks)
-      })
     })
 
     describe('fetchUserHoursAssignments', () => {

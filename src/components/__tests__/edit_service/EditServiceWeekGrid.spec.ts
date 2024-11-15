@@ -51,16 +51,6 @@ describe('EditServiceWeekGrid', () => {
     describe('watch', () => {
       describe('selected week', () => {
         beforeEach(async () => {
-          // Eliminamos la semana actual de la lista de semanas activas, que es la variable que se revisa con
-          // el getter weekContainsData
-
-          // El nuevo arreglo activeWeeks contendrá solamente la semana anterior a la actual, de esta manera
-          // se podrá determinar qué action de serviceStore se debe llamar en el watch
-          serviceStore.$patch({
-            activeWeeks: [testTime.week - 1]
-          })
-
-          // Cambiamos el estado de selectedWeek a la semana anterior, contenida en activeWeeks
           serviceStore.$patch({ selectedWeek: testTime.week - 1 })
           await flushPromises()
         })

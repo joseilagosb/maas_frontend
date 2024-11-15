@@ -25,9 +25,6 @@ const getDefaultServiceState = (): ServiceState => {
 export const useServiceStore = defineStore('service', {
   state: (): ServiceState => getDefaultServiceState(),
   getters: {
-    weekContainsData: (state: ServiceState) => {
-      return state.activeWeeks.includes(state.selectedWeek)
-    },
     totalAssignedHours: (state: ServiceState) => {
       if (state.service === undefined) {
         return 0
@@ -47,7 +44,7 @@ export const useServiceStore = defineStore('service', {
     },
     dayOfServiceWeek() {
       return (day: 'first' | 'last') => {
-        const selectedWeekDataAvailable = this.weekContainsData && this.selectedWeekData
+        const selectedWeekDataAvailable = this.totalAssignedHours > 0 && this.selectedWeekData
 
         // Se busca primero en selectedWeekData, si no está disponible se busca en serviceWorkingDays
         // Esto se hace para los registros históricos ya que no siempre van a coincidir con los horarios actuales para
@@ -70,12 +67,9 @@ export const useServiceStore = defineStore('service', {
           name: service.name,
           description: service.description,
           active: service.active,
-          serviceWorkingDays: service.serviceWorkingDays
+          serviceWorkingDays: service.serviceWorkingDays,
+          activeWeeks: service.serviceWeeks.map((serviceWeek: ServiceWeek) => +serviceWeek.week)
         } as Service
-        const activeWeeks = service.serviceWeeks.map(
-          (serviceWeek: ServiceWeek) => +serviceWeek.week
-        )
-        this.activeWeeks = activeWeeks
       } catch (error) {
         throw error
       }

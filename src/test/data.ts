@@ -150,9 +150,9 @@ export const testState = {
     return {
       service: {
         ...testData.service,
-        serviceWorkingDays: [...testData.serviceWorkingDays]
+        serviceWorkingDays: [...testData.serviceWorkingDays],
+        activeWeeks: testData.serviceWeeks.map((serviceWeek: any) => serviceWeek.week)
       },
-      activeWeeks: testData.serviceWeeks.map((serviceWeek: any) => serviceWeek.week),
       userHoursAssignments: testData.userHoursAssignments,
       selectedWeek: testTime.week
     }

@@ -14,6 +14,7 @@ export type Service = {
   description: string
   active: boolean
   serviceWorkingDays: ServiceWorkingDay[]
+  activeWeeks: number[]
 }
 
 export type ServiceWorkingDay = {

@@ -11,7 +11,7 @@ import { useServiceStore } from '@/stores/service'
 
 import { formatDate, getWeek, getYear } from '@/services/date'
 
-import { addToSortedArray, getArrayFromInterval } from '@/utils/common'
+import { getArrayFromInterval } from '@/utils/common'
 import { USER_TAILWIND_COLORS } from '@/utils/constants'
 
 const loading = ref(true)
@@ -20,7 +20,7 @@ const isErrorVisible = ref(false)
 const route = useRoute()
 
 const serviceStore = useServiceStore()
-const { service, userHoursAssignments, dayOfServiceWeek, selectedWeek, activeWeeks, totalHours, totalAssignedHours } = storeToRefs(serviceStore)
+const { service, userHoursAssignments, dayOfServiceWeek, selectedWeek, totalHours, totalAssignedHours } = storeToRefs(serviceStore)
 
 const weekOptions = computed(() => {
   const currentWeek = getWeek()
@@ -30,7 +30,7 @@ const weekOptions = computed(() => {
 
   // Se retorna el intervalo de semanas actuales, más la semana actual insertada en el orden
   // del array si no está incluida y las semanas adicionales al final
-  return [...addToSortedArray(activeWeeks.value, currentWeek), ...additionalWeeks]
+  return [...getArrayFromInterval(service!.value!.activeWeeks[0], currentWeek), ...additionalWeeks]
 })
 
 const isDisabledWeekSelect = computed(() => {
