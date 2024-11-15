@@ -4,7 +4,6 @@ import { useRoute } from 'vue-router'
 import { getWeek, nthDayOfWeek } from '@/services/date'
 
 import { getService, getServiceWeek, getUserHoursAssignments } from '@/services/api'
-import { getEmptyServiceWeekData } from './utils/service'
 
 import type { ServiceState } from '@/types/stores'
 import type { Service, ServiceWeek } from '@/types/models'
@@ -29,6 +28,23 @@ export const useServiceStore = defineStore('service', {
     weekContainsData: (state: ServiceState) => {
       return state.activeWeeks.includes(state.selectedWeek)
     },
+    totalAssignedHours: (state: ServiceState) => {
+      if (state.service === undefined) {
+        return 0
+      }
+
+      return state.userHoursAssignments.reduce((acc, curr) => acc + curr.hoursCount, 0)
+    },
+    totalHours: (state: ServiceState) => {
+      if (state.service === undefined) {
+        return 0
+      }
+
+      return state.service!.serviceWorkingDays.reduce(
+        (acc, curr) => acc + curr.to - curr.from + 1,
+        0
+      )
+    },
     dayOfServiceWeek() {
       return (day: 'first' | 'last') => {
         const selectedWeekDataAvailable = this.weekContainsData && this.selectedWeekData
@@ -42,18 +58,6 @@ export const useServiceStore = defineStore('service', {
         const dayDate = nthDayOfWeek(this.selectedWeek, selectedDay)
         return dayDate
       }
-    },
-    numberOfUnassignedHours: (state: ServiceState) => {
-      const totalAssignedHours: number = state.userHoursAssignments.reduce(
-        (acc, curr) => curr.hoursCount + acc,
-        0
-      )
-      const totalHours = state.service!.serviceWorkingDays.reduce(
-        (acc, curr) => curr.to - curr.from + 1 + acc,
-        0
-      )
-
-      return totalHours - totalAssignedHours
     }
   },
   actions: {
@@ -95,17 +99,6 @@ export const useServiceStore = defineStore('service', {
           mode
         )
         this.selectedWeekData = selectedWeekData
-      } catch (error) {
-        throw error
-      }
-    },
-    generateEmptyServiceWeek() {
-      try {
-        const serviceWeekData: ServiceWeek = getEmptyServiceWeekData(
-          this.service,
-          this.selectedWeek
-        )
-        this.selectedWeekData = serviceWeekData
       } catch (error) {
         throw error
       }

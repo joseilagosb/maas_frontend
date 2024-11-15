@@ -46,7 +46,7 @@ describe('ShowServiceWeekGrid', () => {
   describe('setup', () => {
     describe('watch', () => {
       describe('selected week', () => {
-        beforeEach(() => {
+        beforeEach(async () => {
           // Eliminamos la semana actual de la lista de semanas activas, que es la variable que se revisa con
           // el getter weekContainsData
 
@@ -55,31 +55,14 @@ describe('ShowServiceWeekGrid', () => {
           serviceStore.$patch({
             activeWeeks: [testTime.week - 1]
           })
+
+          // Cambiamos el estado de selectedWeek a la semana anterior, contenida en activeWeeks
+          serviceStore.$patch({ selectedWeek: testTime.week - 1 })
+          await flushPromises()
         })
 
-        describe('week contains data', () => {
-          beforeEach(async () => {
-            // Cambiamos el estado de selectedWeek a la semana anterior, contenida en activeWeeks
-            serviceStore.$patch({ selectedWeek: testTime.week - 1 })
-            await flushPromises()
-          })
-
-          it('runs the fetchServiceWeek action', () => {
-            expect(serviceStore.fetchServiceWeek).toHaveBeenCalledTimes(1)
-          })
-        })
-
-        describe('week doesnt contain data', () => {
-          beforeEach(async () => {
-            // Cambiamos el estado de selectedWeek a dos semanas atrás, que no está contenida en activeWeeks
-            // Esto hará que la action generateEmptyServiceWeek sea llamada
-            serviceStore.$patch({ selectedWeek: testTime.week - 2 })
-            await flushPromises()
-          })
-
-          it('runs the generateEmptyServiceWeek action', () => {
-            expect(serviceStore.generateEmptyServiceWeek).toHaveBeenCalledTimes(1)
-          })
+        it('runs the fetchServiceWeek action', () => {
+          expect(serviceStore.fetchServiceWeek).toHaveBeenCalledTimes(1)
         })
       })
 
@@ -97,24 +80,6 @@ describe('ShowServiceWeekGrid', () => {
 
     describe('actions', () => {
       describe('fetchServiceWeek', () => {
-        it('renders the grid if it succeeds', async () => {
-          serviceStore.$patch({ userHoursAssignments: [...testData.userHoursAssignments] })
-          await flushPromises()
-          expect(wrapper.find(gridSelector).exists()).toBe(true)
-        })
-
-        it('renders error if it fails', async () => {
-          vi.mocked(getServiceWeek).mockImplementationOnce(async () => {
-            return Promise.reject(new Error('error'))
-          })
-          serviceStore.$patch({ userHoursAssignments: [...testData.userHoursAssignments] })
-          await flushPromises()
-
-          expect(wrapper.find(errorMessageSelector).exists()).toBe(true)
-        })
-      })
-
-      describe('generateEmptyServiceWeek', () => {
         it('renders the grid if it succeeds', async () => {
           serviceStore.$patch({ userHoursAssignments: [...testData.userHoursAssignments] })
           await flushPromises()

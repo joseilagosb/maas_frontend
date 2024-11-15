@@ -103,24 +103,5 @@ describe('Service Store', () => {
         })
       })
     })
-
-    describe('generateEmptyServiceWeek', () => {
-      beforeEach(() => {
-        serviceStore.$patch({ service: testState.serviceStore.service })
-      })
-
-      it('throws error if no service is available', () => {
-        serviceStore.$patch({ service: undefined })
-        expect(() => serviceStore.generateEmptyServiceWeek()).toThrowError()
-      })
-
-      it('generates an empty service week', () => {
-        const { selectedWeekData } = testState.showServiceStoreWithEmptyServiceWeekData
-        serviceStore.generateEmptyServiceWeek()
-
-        expect(serviceStore.selectedWeekData).toBeDefined()
-        expect(serviceStore.selectedWeekData).toEqual(selectedWeekData)
-      })
-    })
   })
 })

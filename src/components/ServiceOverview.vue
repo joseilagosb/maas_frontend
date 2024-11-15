@@ -20,7 +20,7 @@ const isErrorVisible = ref(false)
 const route = useRoute()
 
 const serviceStore = useServiceStore()
-const { service, userHoursAssignments, dayOfServiceWeek, selectedWeek, activeWeeks, weekContainsData, numberOfUnassignedHours } = storeToRefs(serviceStore)
+const { service, userHoursAssignments, dayOfServiceWeek, selectedWeek, activeWeeks, totalHours, totalAssignedHours } = storeToRefs(serviceStore)
 
 const weekOptions = computed(() => {
   const currentWeek = getWeek()
@@ -34,7 +34,6 @@ const weekOptions = computed(() => {
 })
 
 const isDisabledWeekSelect = computed(() => {
-  console.log("hai", route.name)
   return route.name === 'edit-service-week'
 })
 
@@ -92,8 +91,9 @@ onMounted(() => {
           <h3 class="text-3xl font-condensed-medium">Horas asignadas
           </h3>
         </div>
-        <div class="py-1 flex flex-col gap-2" :class="{ 'border border-black': !weekContainsData }">
-          <div v-if="!weekContainsData" class="px-4 py-4 text-center" data-testid="no-user-hours-assignments-message">
+        <div class="py-1 flex flex-col gap-2" :class="{ 'border border-black': totalAssignedHours === 0 }">
+          <div v-if="totalAssignedHours === 0" class="px-4 py-4 text-center"
+            data-testid="no-user-hours-assignments-message">
             <span class="font-light text-3xl">Todavía no se han asignado usuarios para esta semana.</span>
           </div>
           <div v-else class="w-full px-4 py-2 flex items-center justify-between"
@@ -103,12 +103,9 @@ onMounted(() => {
             <span class="font-light text-2xl">{{ user.hoursCount }}</span>
           </div>
           <p class="text-center text-lg text-gray-700" data-testid="unassigned-hours-message">{{
-            numberOfUnassignedHours
-          }}
+            totalHours - totalAssignedHours }}
             horas
-            {{
-              weekContainsData ? "sin asignar" :
-                "disponibles" }}</p>
+            {{ totalAssignedHours === 0 ? "disponibles" : "sin asignar" }}</p>
         </div>
       </div>
       <div class="w-[80%] overflow-y-auto tiny-scrollbar">

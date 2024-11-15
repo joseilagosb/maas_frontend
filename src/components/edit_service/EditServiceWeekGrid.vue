@@ -17,7 +17,7 @@ const authStore = useAuthStore()
 const serviceStore = useServiceStore()
 const serviceAvailabilityStore = useServiceAvailabilityStore()
 const { availabilityData } = storeToRefs(serviceAvailabilityStore)
-const { userHoursAssignments, weekContainsData, selectedWeek, selectedWeekData, dayOfServiceWeek } = storeToRefs(serviceStore)
+const { userHoursAssignments, selectedWeek, selectedWeekData, dayOfServiceWeek } = storeToRefs(serviceStore)
 
 const onChangeCheckbox = (event: Event, day: number, hour: number) => {
   serviceAvailabilityStore.updateAvailabilityChanges(day, hour, (event.target as HTMLInputElement).checked)
@@ -27,17 +27,10 @@ watch([userHoursAssignments, selectedWeek], () => {
   loading.value = true
   isErrorVisible.value = false
 
-  if (!weekContainsData.value) {
-    serviceStore.generateEmptyServiceWeek()
-    serviceAvailabilityStore.generateAvailability()
-    loading.value = false
-    return
-  }
-
   serviceStore
     .fetchServiceWeek('edit')
     .then(() => { serviceAvailabilityStore.generateAvailability() })
-    .catch(() => { isErrorVisible.value = true })
+    .catch(() => isErrorVisible.value = true)
     .finally(() => { loading.value = false })
 })
 </script>

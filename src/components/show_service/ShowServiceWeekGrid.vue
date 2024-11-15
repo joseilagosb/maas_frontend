@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted, ref, watch } from 'vue'
+import { ref, watch } from 'vue'
 import { storeToRefs } from 'pinia'
 
 import { USER_TAILWIND_COLORS } from '@/utils/constants'
@@ -13,17 +13,11 @@ const isErrorVisible = ref(false)
 
 const serviceStore = useServiceStore()
 
-const { userHoursAssignments, dayOfServiceWeek, selectedWeekData, weekContainsData, selectedWeek } = storeToRefs(serviceStore)
+const { userHoursAssignments, dayOfServiceWeek, selectedWeekData, selectedWeek } = storeToRefs(serviceStore)
 
 watch([userHoursAssignments, selectedWeek], () => {
   loading.value = true
   isErrorVisible.value = false
-
-  if (!weekContainsData.value) {
-    serviceStore.generateEmptyServiceWeek()
-    loading.value = false
-    return
-  }
 
   serviceStore
     .fetchServiceWeek()
@@ -61,7 +55,7 @@ watch([userHoursAssignments, selectedWeek], () => {
         <div class="w-[60%] flex items-center justify-center">
           <span class="font-medium" data-testid="grid-hour-designated-user">{{
             designatedUser ? designatedUser.name : 'Sin asignar'
-            }}</span>
+          }}</span>
         </div>
       </div>
     </div>
