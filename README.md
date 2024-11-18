@@ -1,6 +1,6 @@
 # MaaS (Monitoring as a Service) Frontend App
 
-Web application developed with Vue 3, Pinia and TypeScript. This application is responsible for managing the API of the platform and displaying the available services and the assigned shifts to the users. The internals of the business logic and shifts scheduling algorithm are implemented in the [maas_backend](https://github.com/joselagos/maas_backend) repository.
+Web application developed with Vue 3, Pinia and TypeScript. It displays the available services and the assigned shifts delegated to the users. The internals of the endpoint API and shifts scheduling algorithm are described in the [maas_backend](https://github.com/joselagos/maas_backend) repository.
 
 ## Features
 
